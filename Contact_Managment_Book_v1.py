@@ -187,4 +187,18 @@ class AddressBook(UserDict):
 
     def load_from_json(self, filename):
         try:
-            with open(filename, "r") as
+            with open(filename, "r") as f:
+                records_json = json.load(f)
+                for record_json in records_json:
+                    record = Record(record_json["name"])
+                    for phone in record_json.get("phones", []):
+                        record.add_phone(phone)
+                    birthday = record_json.get("birthday", None)
+                    if birthday and birthday != "День народження не встановлено":
+                        record.add_birthday(birthday)
+                    notes = record_json.get("notes", [])
+                    for note in notes:
+                        record.notions.add_note(note["note"], " ".join(note.get("tags", [])))
+                    self.add_record(record)
+        except FileNotFoundError:
+            print(f"Файл {filename} не знайдено.")
