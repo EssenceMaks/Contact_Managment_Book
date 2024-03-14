@@ -1,7 +1,6 @@
-import re
 import json
 import datetime
-import os
+import re
 from collections import UserDict
 
 class Field:
@@ -23,7 +22,7 @@ class Phone(Field):
         if self._validate_phone(value):
             super().__init__(value)
         else:
-            raise ValueError("Invalid phone number format. Phone number should be 10 digits. Please try to use command change to User")
+            raise ValueError("\n Невірний формат номеру телефону. Номер телефону має складатися з 10 цифр.")
 
     def _validate_phone(self, value):
         return len(value) == 10 and value.isdigit()
@@ -35,17 +34,26 @@ class Birthday(Field):
     def __str__(self):
         return self.value.strftime('%d.%m.%Y')
 
-class Notion(Field):
-    def __init__(self, text):
-        super().__init__(text)
-        self.hashtags = self._find_hashtags()
+class Notion:
+    def __init__(self, text, hashtags):
+        self.text = self.validate_text(text)
+        self.hashtags = self.validate_hashtags(hashtags)
 
-    def _find_hashtags(self):
-        return re.findall(r"#\w+", self.value)
+    @staticmethod
+    def validate_text(text, max_length=280):
+        if not text or len(text) > max_length:
+            raise ValueError("Текст нотатки пустий або перевищує максимальну допустиму довжину.")
+        return text
 
-    def edit_notion(self, new_text):
-        self.value = new_text
-        self.hashtags = self._find_hashtags()
+    @staticmethod
+    def validate_hashtags(hashtags):
+        pattern = re.compile(r"^#[\w]+$")
+        validated_hashtags = []
+        for hashtag in hashtags:
+            if not pattern.match(hashtag):
+                raise ValueError("Невірний формат хештегу. Хештеги повинні починатися з символу #.")
+            validated_hashtags.append(hashtag)
+        return validated_hashtags
 
 class Record:
     def __init__(self, name):
@@ -55,34 +63,21 @@ class Record:
         self.notions = []
 
     def add_phone(self, phone):
-        try:
-            self.phones.append(Phone(phone))
-        except ValueError as e:
-            print(e)
+        self.phones.append(Phone(phone))
 
     def remove_phone(self, phone):
         self.phones = [p for p in self.phones if str(p) != phone]
 
     def edit_phone(self, old_phone_index, new_phone):
-        try:
-            old_phone_index = int(old_phone_index)
-            if 0 <= old_phone_index < len(self.phones):
-                self.phones[old_phone_index] = Phone(new_phone)
-                print("Номер телефону успішно змінено!")
-            else:
-                print("Невірний індекс номера телефону.")
-        except ValueError:
-            print("Невірний індекс номера телефону. Будь ласка, введіть коректний номер.")
+        old_phone_index = int(old_phone_index)
+        if 0 <= old_phone_index < len(self.phones):
+            self.phones[old_phone_index] = Phone(new_phone)
+            print("Номер телефону успішно змінено!")
+        else:
+            print("Невірний індекс номеру телефону.")
 
-    def display_phones(self):
-        for i, phone in enumerate(self.phones):
-            print(f"{i}: {phone}")
-
-    def find_phone(self, phone):
-        for p in self.phones:
-            if str(p) == phone:
-                return p
-        return None
+    def add_notion(self, text, hashtags):
+        self.notions.append(Notion(text, hashtags))
 
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
@@ -91,78 +86,63 @@ class Record:
         if self.birthday:
             return str(self.birthday)
         else:
-            return "День народження не встановлено"
-
-    def add_notion(self, notion):
-        self.notions.append(Notion(notion))
-
-    def edit_notion(self, notion_index, new_text):
-        try:
-            notion_index = int(notion_index)
-            if 0 <= notion_index < len(self.notions):
-                self.notions[notion_index].edit_notion(new_text)
-                print("Нотатку успішно змінено!")
-            else:
-                print("Невірний індекс нотатки.")
-        except ValueError:
-            print("Невірний індекс нотатки. Будь ласка, введіть коректний номер.")
-
-    def remove_notion(self, notion_index):
-        try:
-            notion_index = int(notion_index)
-            if 0 <= notion_index < len(self.notions):
-                del self.notions[notion_index]
-                print("Нотатку успішно видалено!")
-            else:
-                print("Невірний індекс нотатки.")
-        except ValueError:
-            print("Невірний індекс нотатки. Будь ласка, введіть коректний номер.")
-
-    def display_notions(self):
-        for i, notion in enumerate(self.notions):
-            print(f"{i}: {notion}")
+            return "Дата народження не встановлена"
 
     def __str__(self):
-        notions_str = '; '.join([str(notion) for notion in self.notions])
-        return f"Контакт: {self.name}, телефони: {'; '.join(str(p) for p in self.phones)}, день народження: {self.show_birthday()}, нотатки: {notions_str}"
+        return f"Ім'я контакту: {self.name}, телефони: {'; '.join(str(p) for p in self.phones)}, дата народження: {self.show_birthday()}"
 
 class AddressBook(UserDict):
-    def __init__(self, filename="contacts_book.json"):
+    def __init__(self):
         super().__init__()
-        self.filename = filename
         self.load_from_json()
 
-    def load_from_json(self):
-        if os.path.exists(self.filename):
-            try:
-                with open(self.filename, "r") as file:
-                    data = json.load(file)
-                    for item in data:
-                        record = Record(item["name"])
-                        for phone in item.get("phones", []):
-                            if phone is not None:
-                                record.add_phone(phone)
-                        birthday = item.get("birthday")
-                        if birthday and birthday != 'None':
-                            record.add_birthday(birthday)
-                        for notion_item in item.get("notions", []):
-                            record.add_notion(notion_item["text"])
-                        self.add_record(record)
-                print(f"Дані успішно завантажено з {self.filename}!")
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                print(f"Помилка при завантаженні з файлу {self.filename}: {e}")
+    def add_record(self, record):
+        self.data[record.name.value.lower()] = record
 
-    def save_to_json(self):
-        with open(self.filename, 'w') as f:
+    def save_to_json(self, filename="contacts_book.json"):
+        with open(filename, 'w') as f:
             json.dump([{
                 "name": record.name.value,
                 "phones": [str(phone) for phone in record.phones],
                 "birthday": str(record.birthday) if record.birthday else None,
-                "notions": [{"text": notion.value, "hashtags": notion.hashtags} for notion in record.notions]
+                "notions": [{"text": notion.text, "hashtags": notion.hashtags} for notion in record.notions]
             } for record in self.data.values()], f, indent=4)
-        print(f"Дані успішно збережено до {self.filename}!")
 
-    def add_record(self, record):
-        super().add_record(record)
-        self.save_to_json()
+    def load_from_json(self, filename="contacts_book.json"):
+        try:
+            with open(filename, "r") as file:
+                data = json.load(file)
+                for item in data:
+                    record = Record(item["name"])
+                    for phone in item.get("phones", []):
+                        record.add_phone(phone)
+                    birthday = item.get("birthday")
+                    if birthday and birthday != 'None':
+                        record.add_birthday(birthday)
+                    for notion in item.get("notions", []):
+                        record.add_notion(notion["text"], notion.get("hashtags", []))
+                    self.add_record(record)
+            print("Дані успішно завантажено.")
+        except FileNotFoundError:
+            print("Файл не знайдено.")
+        except json.JSONDecodeError:
+            print("Помилка декодування JSON.")
 
+def main():
+    # Create an instance of AddressBook
+    address_book = AddressBook()
+
+    # Perform desired operations on the address book
+    # For example, add a record
+    record = Record("John Doe")
+    record.add_phone("1234567890")
+    address_book.add_record(record)
+
+    # Save the address book to JSON
+    address_book.save_to_json()
+
+    # Load the address book from JSON
+    address_book.load_from_json()
+
+if __name__ == "__main__":
+    main()
