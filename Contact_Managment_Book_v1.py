@@ -19,6 +19,7 @@ class Name(Field):
         else:
             super().__init__(first_name)
 
+
 class Phone(Field):
     def __init__(self, value):
         if self._validate_phone(value):
@@ -26,12 +27,13 @@ class Phone(Field):
         else:
             raise ValueError("Неправильний формат номеру телефону. Номер повинен містити 10 цифр.")
 
-    def _validate_phone(self, value):
+    @staticmethod
+    def _validate_phone(value):
         return len(value) == 10 and value.isdigit()
+
 
 class Birthday(Field):
     def __init__(self, value):
-        self.value = datetime.datetime.strptime(value, '%d.%m.%Y')
         try:
             self.value = datetime.datetime.strptime(value, '%d.%m.%Y')
         except ValueError:
@@ -40,19 +42,20 @@ class Birthday(Field):
     def __str__(self):
         return self.value.strftime('%d.%m.%Y')
 
-    def __str__(self):
-        return self.value.strftime('%d.%m.%Y')
+
 class Notion:
     def __init__(self, text, hashtags):
         self.text = self._validate_text(text)
         self.hashtags = self._validate_hashtags(hashtags)
 
-    def _validate_text(self, text):
+    @staticmethod
+    def _validate_text(text):
         if not text or len(text) > 280:
             raise ValueError("Текст нотатки не може бути порожнім або перевищувати 280 символів.")
         return text
 
-    def _validate_hashtags(self, hashtags):
+    @staticmethod
+    def _validate_hashtags(hashtags):
         validated_hashtags = []
         pattern = re.compile(r"^#\w+$")
         for hashtag in hashtags.split():
@@ -61,6 +64,7 @@ class Notion:
             else:
                 raise ValueError("Неправильний формат хештегу.")
         return validated_hashtags
+
 
 class Record:
     def __init__(self, name):
@@ -80,9 +84,9 @@ class Record:
 
     def edit_phone(self, old_phone_index, new_phone):
         try:
-            old_phone_index = int(old_phone_index)  # Конвертуємо введений індекс в ціле число
-            if 0 <= old_phone_index < len(self.phones):  # Перевіряємо, чи введений індекс знаходиться в межах списку телефонів
-                self.phones[old_phone_index] = Phone(new_phone)  # Міняємо вибраний номер на новий
+            old_phone_index = int(old_phone_index)
+            if 0 <= old_phone_index < len(self.phones):
+                self.phones[old_phone_index] = Phone(new_phone)
                 print("Phone number changed successfully!")
             else:
                 print("Невірний індекс номеру телефону.")
@@ -107,13 +111,15 @@ class Record:
             return str(self.birthday)
         else:
             return "День народження не встановлено"
+
     def __str__(self):
         return f"Contact name: {self.name}, phones: {'; '.join(str(p) for p in self.phones)}, birthday: {self.show_birthday()}"
-    
+
     def add_notion(self, text, hashtags):
         self.notions.append(Notion(text, hashtags))
 
     def edit_notion(self, index, new_text, new_hashtags):
+        index = int(index)
         if 0 <= index < len(self.notions):
             self.notions[index] = Notion(new_text, new_hashtags)
             print("Нотатку успішно змінено.")
@@ -121,11 +127,13 @@ class Record:
             raise ValueError("Неправильний індекс нотатки.")
 
     def delete_notion(self, index):
+        index = int(index)
         if 0 <= index < len(self.notions):
             del self.notions[index]
             print("Нотатку успішно видалено.")
         else:
             raise ValueError("Неправильний індекс нотатки.")
+
 
 class AddressBook(UserDict):
     def __init__(self):
@@ -134,23 +142,19 @@ class AddressBook(UserDict):
         self.load_from_json()
 
     def find(self, name):
-        # Перевіряємо ім'я контакту у нижному регістрі
         name_lower = name.lower()
         return self.data.get(name_lower)
 
-@@ -99,184 +128,247 @@ def add_record(self, record):
-
     def delete(self, name):
         name_lower = name.lower()
-        # Використовуємо ім'я контакту у нижному регістрі як ключ для видалення
         if name_lower in self.data:
             del self.data[name_lower]
-            print(f"Контакт {name} успішно видалено!")
+            print(f"Контакт {name} видалено успішно.")
         else:
-            print("Контакт не знайдено!")
+            print("Контакт не знайдено.")
 
     def add_record(self, record):
-     self.data[record.name.value.lower()] = record
+        self.data[record.name.value.lower()] = record
 
     def find_by_notion_or_hashtag(self, hashtag):
         results = []
@@ -170,52 +174,45 @@ class AddressBook(UserDict):
                     break
         return sorted(sorted_records)
 
-    def birthdays(self):
-        today = datetime.datetime.now()
-        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []}
-        for record in self.data.values():
-            if record.birthday:
-                birthday_date = record.birthday.value
-                next_birthday = birthday_date.replace(year=today.year)
-                if next_birthday < today:
-                    next_birthday = next_birthday.replace(year=today.year + 1)
-                delta_days = (next_birthday - today).days
-                birthday_weekday = next_birthday.strftime('%A')
-                if 0 <= delta_days < 7:
-                    if birthday_weekday in ['Saturday', 'Sunday']:
-                        if 'Next Monday' not in birthdays_this_week:
-                            birthdays_this_week['Next Monday'] = []
-                        birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
-                    else:
-                        birthdays_this_week[birthday_weekday].append(record.name.value)
-                elif delta_days == 7:
+def birthdays(self):
+    today = datetime.datetime.now()
+    birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []}
+    for record in self.data.values():
+        if record.birthday:
+            birthday_date = record.birthday.value
+            next_birthday = birthday_date.replace(year=today.year)
+            if next_birthday < today:
+                next_birthday = next_birthday.replace(year=today.year + 1)
+            delta_days = (next_birthday - today).days
+            birthday_weekday = next_birthday.strftime('%A')
+            if 0 <= delta_days < 7:
+                if birthday_weekday in ['Saturday', 'Sunday']:
                     if 'Next Monday' not in birthdays_this_week:
                         birthdays_this_week['Next Monday'] = []
-                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
+                else:
+                    birthdays_this_week[birthday_weekday].append(record.name.value)
+            elif delta_days == 7:
+                if 'Next Monday' not in birthdays_this_week:
+                    birthdays_this_week['Next Monday'] = []
+                birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
 
-        upcoming_birthdays = []        for day, names in birthdays_this_week.items():
-            if names:
-                print(f"{day}: {', '.join(names)}")
-                upcoming_birthdays.extend(names)
+    upcoming_birthdays = []
+    for day, names in birthdays_this_week.items():
+        if names:
+            print(f"{day}: {', '.join(names)}")
+            upcoming_birthdays.extend(names)
 
-        return upcoming_birthdays
-    def load_from_json(self):
-        try:
-            with open(self.filename, 'r') as f:
-                data = json.load(f)
-                self.data.clear()
-                for record_data in data:
-                    record = Record(record_data["name"])
-                    for phone in record_data.get("phones", []):
-                        record.add_phone(phone)
-                    birthday = record_data.get("birthday")
-                    if birthday:
-                        record.add_birthday(birthday)
-                    for notion_data in record_data.get("notions", []):
-                        hashtags = ' '.join(notion_data["hashtags"])
-                        record.add_notion(notion_data["text"], hashtags)
-                    self.add_record(record)
-        print("Дані успішно збережено.")
+    return upcoming_birthdays
+
+def save_to_json(self):
+    with open(self.filename, 'w') as f:
+        json_data = []
+        for record in self.data.values():
+            record_data = {'name': str(record.name), 'phones': [str(phone) for phone in record.phones], 'birthday': str(record.birthday) if record.birthday else None, 'notions': [{'text': notion.text, 'hashtags': notion.hashtags} for notion in record.notions]}
+            json_data.append(record_data)
+        json.dump(json_data, f, ensure_ascii=False, indent=4)
+    print("Дані успішно збережено.")
 
     def load_from_json(self):
         try:
