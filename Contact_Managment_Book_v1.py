@@ -1,3 +1,4 @@
+import re
 import json
 import datetime
 from collections import UserDict
@@ -37,6 +38,15 @@ class Birthday(Field):
     def __str__(self):
         return self.value.strftime('%d.%m.%Y')
 
+class Email(Field):
+    def __init__(self, value):
+        # Зберігаємо pattern для повторного використання
+        self.pattern = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+        # Зберігаємо email, якщо він валідний
+        self.value = value
+        if not self.pattern.match(value):
+            # Викидаємо помилку для невалідного email
+            raise ValueError("Invalid email address")
 
 class Find:
     @staticmethod
@@ -70,6 +80,7 @@ class Record:
     def __init__(self, name):
         self.name = Name(*name.split())
         self.phones = []
+        self.email = None
         self.birthday = None
 
     def add_phone(self, phone):
@@ -83,9 +94,12 @@ class Record:
 
     def edit_phone(self, old_phone_index, new_phone):
         try:
-            old_phone_index = int(old_phone_index)  # Конвертуємо введений індекс в ціле число
-            if 0 <= old_phone_index < len(self.phones):  # Перевіряємо, чи введений індекс знаходиться в межах списку телефонів
-                self.phones[old_phone_index] = Phone(new_phone)  # Міняємо вибраний номер на новий
+            # Конвертуємо введений індекс в ціле число
+            old_phone_index = int(old_phone_index)
+            # Перевіряємо, чи введений індекс знаходиться в межах списку телефонів
+            if 0 <= old_phone_index < len(self.phones):
+                # Міняємо вибраний номер на новий
+                self.phones[old_phone_index] = Phone(new_phone)
                 print("Phone number changed successfully!")
             else:
                 print("Invalid phone number index.")
@@ -101,6 +115,15 @@ class Record:
             if str(p) == phone:
                 return p
         return None
+    
+    def add_email(self, email):
+        self.email = Email(email)
+
+    def show_email(self):
+        if self.email:
+            return str(self.email)
+        else:
+            return "No email added"
 
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
@@ -112,7 +135,7 @@ class Record:
             return "Birthday not set"
 
     def __str__(self):
-        return f"Contact name: {self.name}, phones: {'; '.join(str(p) for p in self.phones)}, birthday: {self.show_birthday()}"
+        return f"Contact name: {self.name}, phones: {'; '.join(str(p) for p in self.phones)}, email: {self.email}, birthday: {self.show_birthday()}"
 
 
 class AddressBook(UserDict):
@@ -172,6 +195,7 @@ class AddressBook(UserDict):
             json.dump([{
                 "name": record.name.value,
                 "phones": [str(phone) for phone in record.phones],
+                "email": str(record.email),
                 "birthday": str(record.birthday)
             } for record in self.data.values()], f, indent=4)
 
@@ -184,6 +208,10 @@ class AddressBook(UserDict):
                     for phone in item.get("phones", []):
                         if phone is not None:
                             record.add_phone(phone)
+                    email = item.get("email")
+                    if email is not None:
+                        if email != 'None':
+                            record.add_email(email)
                     birthday = item.get("birthday")
                     if birthday is not None:
                         if birthday != 'None':
@@ -208,6 +236,8 @@ def main():
                         "phone [ім'я]                  -- to get a contact's phone number\n"
                         "delete [ім'я]                 -- to delete a contact\n"
                         "all                           -- to show all contacts\n"
+                        "add-email [ім'я] [email]      -- to add an email for a contact\n"
+                        "show-email [ім'я]             -- to show a contact's email\n"
                         "add-birthday [ім'я] [дата]    -- to add a birthday for a contact\n"
                         "show-birthday [ім'я]          -- to show a contact's birthday\n"
                         "birthdays                     -- to show upcoming birthdays\n"
@@ -264,6 +294,22 @@ def main():
         elif command == 'all':
             for record in book.data.values():
                 print(record)
+
+        elif command == 'add-email':
+            name = input("Enter contact name: ").strip().lower()
+            email = input("Enter email: ").strip()
+            if name in book.data:
+                book.data[name].add_email(email)
+                print(f"Email added successfully for contact {book.data[name].name.value}!")
+            else:
+                print("Contact not found!")
+
+        elif command == 'show-email':
+            name = input("Enter contact name: ").strip().lower()
+            if name in book.data:
+                print(f"Email for {book.data[name].name.value}: {book.data[name].show_email()}")
+            else:
+                print("Contact not found!")
 
         elif command == 'add-birthday':
             name = input("Enter contact name: ").strip().lower()
