@@ -2,6 +2,29 @@ import json
 import datetime
 from collections import UserDict
 
+class Address:
+    def __init__(self, address):
+        self.addresses = [address]
+
+    def add_address(self, address):
+        if isinstance(address, str):
+            self.addresses.append(address)
+        else:
+            print("Invalid address format. Please provide a string.")
+
+    def show_address(self, name):
+        if self.addresses:
+            return f"{name}'s address is {self.addresses[0]}"
+        else:
+            return "No address was provided"
+            
+    def edit_address(self, new_address):
+        self.addresses = [new_address]
+        return "Address has been successfully edited"
+
+    def delete_address(self, address):
+        self.addresses = [a for a in self.addresses if str(a) != str(address)]
+
 
 class Field:
     def __init__(self, value):
@@ -71,6 +94,7 @@ class Record:
         self.name = Name(*name.split())
         self.phones = []
         self.birthday = None
+        self.address = None
 
     def add_phone(self, phone):
         try:
@@ -113,6 +137,21 @@ class Record:
 
     def __str__(self):
         return f"Contact name: {self.name}, phones: {'; '.join(str(p) for p in self.phones)}, birthday: {self.show_birthday()}"
+    
+    def add_address(self, address):
+        self.address = Address(address)
+
+    def edit_address(self, new_address):
+        self.address.edit_address(new_address)
+
+    def delete_address(self, address):
+        self.address = None
+    
+    def show_address(self):
+        if self.address:
+            return self.address.show_address(self.name.value)
+        else:
+            return "No address found"
 
 
 class AddressBook(UserDict):
@@ -166,6 +205,17 @@ class AddressBook(UserDict):
                 upcoming_birthdays.extend(names)
 
         return upcoming_birthdays
+    
+    def edit_address(self, name, new_address):
+        if name in self.data:
+            record = self.data[name]
+            if record.address:
+                record.address.edit_address(new_address)
+                print(f"Address for {name} has been successfully edited to {new_address}.")
+            else:
+                print(f"No address has been added to {name} yet.")
+        else:
+            print(f"Contact {name} not found.")
 
     def save_to_json(self, filename):
         with open(filename, 'w') as f:
@@ -331,6 +381,51 @@ def main():
             filename = input("Enter the filename to load from (e.g., contacts.json): ").strip()
             book.load_from_json(filename)
             print("Contacts loaded successfully!")
+
+        elif command == 'add-address':
+            name = input("Enter the name of the contact you want to add the address to: ")
+            if name in book:
+                address = input("Enter the address: ")
+                record = book[name]
+                record.add_address(address)
+                print(f"Address {address} added to contact {name} successfully!")
+            else:
+                print(f"Contact {name} not found.")
+
+        elif command == "show-address":
+            name = input("Enter the name of the contact whose address you want to see: ")
+            if name in book:
+                record = book[name]
+                if record.address:
+                    print(record.address.show_address(record.name.value))
+                else:
+                    print("Address for this contact has not been added yet or has been deleted")
+            else:
+                print("Contact not found")
+
+        elif command == "edit-address":
+            name = input("Enter the name of the contact whose address you want to change: ")
+            if name in book:
+                record = book[name]
+                if record.address:
+                    new_address = input("Enter the new address: ")
+                    result = book.edit_address(name, new_address)
+                    if result is not None:
+                        print(result)
+                else:
+                    print(f"No address has been added to {name} yet.")
+
+        elif command == "delete-address":
+            name = input("Enter the name of the contact whose address you want to delete: ")
+            if name in book:
+                record = book[name]
+                if record.address:
+                    record.delete_address(record.address.show_address(name))
+                    print(f"Address for {name} has been successfully deleted.")
+                else:
+                    print(f"No address was provided for {name}.")
+            else:
+                print(f"Contact {name} not found.")
 
         elif command == 'hello':
             print("Hello! How can I assist you?")
