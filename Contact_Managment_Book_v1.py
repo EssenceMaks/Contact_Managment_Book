@@ -3,6 +3,7 @@ import datetime
 import re
 from collections import UserDict
 
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -10,9 +11,13 @@ class Field:
     def __str__(self):
         return str(self.value)
 
+
 class Name(Field):
-    def __init__(self, value):
-        super().__init__(value)
+    def __init__(self, first_name, last_name=None):
+        if last_name:
+            super().__init__(f"{first_name} {last_name}")
+        else:
+            super().__init__(first_name)
 
 class Phone(Field):
     def __init__(self, value):
@@ -26,10 +31,14 @@ class Phone(Field):
 
 class Birthday(Field):
     def __init__(self, value):
+        self.value = datetime.datetime.strptime(value, '%d.%m.%Y')
         try:
             self.value = datetime.datetime.strptime(value, '%d.%m.%Y')
         except ValueError:
             raise ValueError("Неправильний формат дати народження. Використовуйте формат ДД.ММ.РРРР.")
+
+    def __str__(self):
+        return self.value.strftime('%d.%m.%Y')
 
     def __str__(self):
         return self.value.strftime('%d.%m.%Y')
@@ -55,23 +64,26 @@ class Notion:
 
 class Record:
     def __init__(self, name):
-        self.name = Name(name)
+        self.name = Name(*name.split())
         self.phones = []
         self.birthday = None
         self.notions = []
 
     def add_phone(self, phone):
-        self.phones.append(Phone(phone))
+        try:
+            self.phones.append(Phone(phone))
+        except ValueError as e:
+            print(e)
 
     def remove_phone(self, phone):
         self.phones = [p for p in self.phones if str(p) != phone]
 
-    def edit_phone(self, index, new_phone):
+    def edit_phone(self, old_phone_index, new_phone):
         try:
-            index = int(index)
-            if 0 <= index < len(self.phones):
-                self.phones[index] = Phone(new_phone)
-                print("Номер телефону успішно змінено!")
+            old_phone_index = int(old_phone_index)  # Конвертуємо введений індекс в ціле число
+            if 0 <= old_phone_index < len(self.phones):  # Перевіряємо, чи введений індекс знаходиться в межах списку телефонів
+                self.phones[old_phone_index] = Phone(new_phone)  # Міняємо вибраний номер на новий
+                print("Phone number changed successfully!")
             else:
                 print("Невірний індекс номеру телефону.")
         except ValueError:
@@ -95,7 +107,9 @@ class Record:
             return str(self.birthday)
         else:
             return "День народження не встановлено"
-
+    def __str__(self):
+        return f"Contact name: {self.name}, phones: {'; '.join(str(p) for p in self.phones)}, birthday: {self.show_birthday()}"
+    
     def add_notion(self, text, hashtags):
         self.notions.append(Notion(text, hashtags))
 
@@ -120,19 +134,23 @@ class AddressBook(UserDict):
         self.load_from_json()
 
     def find(self, name):
+        # Перевіряємо ім'я контакту у нижному регістрі
         name_lower = name.lower()
         return self.data.get(name_lower)
 
-    def add_record(self, record):
-        self.data[record.name.value.lower()] = record
+@@ -99,184 +128,247 @@ def add_record(self, record):
 
     def delete(self, name):
         name_lower = name.lower()
+        # Використовуємо ім'я контакту у нижному регістрі як ключ для видалення
         if name_lower in self.data:
             del self.data[name_lower]
             print(f"Контакт {name} успішно видалено!")
         else:
             print("Контакт не знайдено!")
+
+    def add_record(self, record):
+     self.data[record.name.value.lower()] = record
 
     def find_by_notion_or_hashtag(self, hashtag):
         results = []
@@ -154,7 +172,7 @@ class AddressBook(UserDict):
 
     def birthdays(self):
         today = datetime.datetime.now()
-        birthdays_this_week = {}
+        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []}
         for record in self.data.values():
             if record.birthday:
                 birthday_date = record.birthday.value
@@ -162,21 +180,41 @@ class AddressBook(UserDict):
                 if next_birthday < today:
                     next_birthday = next_birthday.replace(year=today.year + 1)
                 delta_days = (next_birthday - today).days
+                birthday_weekday = next_birthday.strftime('%A')
                 if 0 <= delta_days < 7:
-                    weekday = next_birthday.strftime('%A')
-                    if weekday not in birthdays_this_week:
-                        birthdays_this_week[weekday] = []
-                    birthdays_this_week[weekday].append(record.name.value)
-        for day, names in birthdays_this_week.items():
-            print(f"{day}: {', '.join(names)}")
+                    if birthday_weekday in ['Saturday', 'Sunday']:
+                        if 'Next Monday' not in birthdays_this_week:
+                            birthdays_this_week['Next Monday'] = []
+                        birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
+                    else:
+                        birthdays_this_week[birthday_weekday].append(record.name.value)
+                elif delta_days == 7:
+                    if 'Next Monday' not in birthdays_this_week:
+                        birthdays_this_week['Next Monday'] = []
+                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
 
-    def save_to_json(self):
-        with open(self.filename, 'w') as f:
-            json.dump([{ "name": record.name.value,
-                         "phones": [str(phone) for phone in record.phones],
-                         "birthday": record.birthday.value.strftime('%d.%m.%Y') if record.birthday else None,
-                         "notions": [{"text": notion.text, "hashtags": ' '.join(notion.hashtags)} for notion in record.notions]
-                       } for record in self.data.values()], f, indent=4)
+        upcoming_birthdays = []        for day, names in birthdays_this_week.items():
+            if names:
+                print(f"{day}: {', '.join(names)}")
+                upcoming_birthdays.extend(names)
+
+        return upcoming_birthdays
+    def load_from_json(self):
+        try:
+            with open(self.filename, 'r') as f:
+                data = json.load(f)
+                self.data.clear()
+                for record_data in data:
+                    record = Record(record_data["name"])
+                    for phone in record_data.get("phones", []):
+                        record.add_phone(phone)
+                    birthday = record_data.get("birthday")
+                    if birthday:
+                        record.add_birthday(birthday)
+                    for notion_data in record_data.get("notions", []):
+                        hashtags = ' '.join(notion_data["hashtags"])
+                        record.add_notion(notion_data["text"], hashtags)
+                    self.add_record(record)
         print("Дані успішно збережено.")
 
     def load_from_json(self):
@@ -232,6 +270,7 @@ def main():
             record = Record(name)
             record.add_phone(phone)
             book.add_record(record)
+            print(f"Контакт {name} додано успішно!")
         elif command == 'change':
             name = input("Введіть ім'я контакту: ").strip().lower()
             if name in book.data:
@@ -287,6 +326,16 @@ def main():
             if len(parts) < 4:
                 print("Недостатньо даних для додавання нотатки. Потрібно ім'я, текст і хештеги.")
             else:
+                print("Contact not found!")
+
+        elif command == 'birthdays':
+            upcoming_birthdays = book.birthdays()
+            print("\nUpcoming birthdays:")
+            for name in upcoming_birthdays:
+                contact = book.find(name)
+                if contact:
+                    phone_number = ", ".join(str(phone) for phone in contact.phones) if contact.phones else "No phone number"
+                    print(f"{name}'s birthday is on {contact.birthday} number for call {phone_number}")
                 name = parts[1]
                 text = parts[2]
                 hashtags = parts[3]
