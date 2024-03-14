@@ -1,7 +1,7 @@
 import json
 import datetime
 from collections import UserDict
-#import re
+
 
 class Field:
     def __init__(self, value):
