@@ -36,6 +36,33 @@ class Birthday(Field):
 
     def __str__(self):
         return self.value.strftime('%d.%m.%Y')
+    
+class Find:
+    @staticmethod
+    def find_by_name(address_book, name):
+        found_contacts = []
+        for record in address_book.values():
+            if record.name.value.lower() == name.lower():
+                found_contacts.append(record)
+        return found_contacts
+
+    @staticmethod
+    def find_by_phone(address_book, phone):
+        found_contacts = []
+        for record in address_book.values():
+            for record_phone in record.phones:
+                if str(record_phone) == phone:
+                    found_contacts.append(record)
+                    break
+        return found_contacts
+    
+    @staticmethod
+    def find_by_birthday(address_book, birthday):
+        found_contacts = []
+        for record in address_book.values():
+            if record.birthday and str(record.birthday) == birthday:
+                found_contacts.append(record)
+        return found_contacts
 
 
 class Record:
@@ -185,6 +212,9 @@ def main():
                         "birthdays                     -- to show upcoming birthdays\n"
                         "save [файл.json]              -- to save contacts to a JSON file\n"
                         "load [файл.json]              -- to load contacts from a JSON file\n"
+                        "find-name [ім'я]              -- to find a contact by name\n"
+                        "find-phone [телефон]          -- to find a contact by phone\n"
+                        "find-birth [дата]             -- to find a contact by birthday\n"
                         "q /good bye/close/exit/quit   -- to exit the assistant\n"
                         "\n"
                         "Enter a command:").strip().lower()
@@ -260,6 +290,36 @@ def main():
                     print(f"{name}'s birthday is on {contact.birthday} number for call {phone_number}")
                 else:
                     print(f"No contact found for {name}")
+
+        elif command == 'find-name':
+            name_to_find = input("Enter name to find: ")
+            found_contacts = Find.find_by_name(book, name_to_find)
+            if found_contacts:
+                print("Found contacts:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("No contacts found.")
+
+        elif command == 'find-phone':
+            phone_to_find = input("Enter phone number to find: ")
+            found_contacts = Find.find_by_phone(book, phone_to_find)
+            if found_contacts:
+                print("Found contacts:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("No contacts found.")
+
+        elif command == 'find-birth':
+            birthday_to_find = input("Enter birthday to find (dd.mm.yyyy): ")
+            found_contacts = Find.find_by_birthday(book, birthday_to_find)
+            if found_contacts:
+                print("Found contacts:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("No contacts found.")
 
         elif command == 'save':
             filename = input("Enter the filename to save to (e.g., contacts.json): ").strip()
