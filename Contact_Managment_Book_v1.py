@@ -134,6 +134,13 @@ class AddressBook(UserDict):
         else:
             print("Contact not found!")
 
+    def all_names(self):
+            formatted_names = []
+            for name in self.data.keys():
+                formatted_name = ' '.join([part.capitalize() for part in name.split()])
+                formatted_names.append(formatted_name)
+            return formatted_names
+
     def birthdays(self):
         today = datetime.datetime.now()
         birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []}
@@ -208,6 +215,7 @@ def main():
                         "phone [ім'я]                  -- to get a contact's phone number\n"
                         "delete [ім'я]                 -- to delete a contact\n"
                         "all                           -- to show all contacts\n"
+                        "all-names                     -- to show all contact names\n"
                         "add-birthday [ім'я] [дата]    -- to add a birthday for a contact\n"
                         "show-birthday [ім'я]          -- to show a contact's birthday\n"
                         "birthdays                     -- to show upcoming birthdays\n"
@@ -264,6 +272,15 @@ def main():
         elif command == 'all':
             for record in book.data.values():
                 print(record)
+
+        elif command == 'all-names':
+            existing_names = book.all_names()
+            if existing_names:
+                print("Existing contact names:")
+                for name in existing_names:
+                    print(name)
+            else:
+                print("No contacts found.")
 
         elif command == 'add-birthday':
             name = input("Enter contact name: ").strip().lower()
