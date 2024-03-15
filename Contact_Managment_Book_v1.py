@@ -113,9 +113,14 @@ class Record:
         except ValueError:
             print("Невірний індекс номеру телефону. Будь ласка, введіть коректний номер.")
 
+    def add_record(self, record):
+        self.data[record.name.value.lower()] = record
+
+    def delete(self, name):
     def display_phones(self):
         for i, phone in enumerate(self.phones):
             print(f"{i}: {phone.value}")
+
 
     def find_phone(self, phone):
         for p in self.phones:
