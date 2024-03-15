@@ -23,8 +23,7 @@ class Phone(Field):
         else:
             raise ValueError("Неправильний формат номеру телефону. Номер повинен містити 10 цифр.")
 
-    @staticmethod
-    def _validate_phone(value):
+    def _validate_phone(self,value):
         return len(value) == 10 and value.isdigit()
 
 class Birthday(Field):
