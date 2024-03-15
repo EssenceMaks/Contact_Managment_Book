@@ -99,7 +99,7 @@ class Record:
             print(e)
 
     def remove_phone(self, phone):
-        self.phones = [p for p in self.phones if p.value != phone]
+        self.phones = [p for p in self.phones if str(p) != phone]
 
     def edit_phone(self, old_phone_index, new_phone):
         try:
@@ -120,7 +120,7 @@ class Record:
 
     def display_phones(self):
         for i, phone in enumerate(self.phones):
-            print(f"{i}: {phone.value}")
+            print(f"{i}: {phone}")
 
 
     def find_phone(self, phone):
