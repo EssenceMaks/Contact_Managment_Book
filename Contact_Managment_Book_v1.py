@@ -37,15 +37,13 @@ class Birthday(Field):
         return self.value.strftime('%d.%m.%Y')
 
 class Find:
-    @staticmethod
     def find_by_name(address_book, name):
         found_contacts = []
         for record in address_book.values():
             if record.name.value.lower() == name.lower():
                 found_contacts.append(record)
-        return found_contacts
+        return found_contacts  
 
-    @staticmethod
     def find_by_phone(address_book, phone):
         found_contacts = []
         for record in address_book.values():
@@ -54,8 +52,7 @@ class Find:
                     found_contacts.append(record)
                     break
         return found_contacts
-
-    @staticmethod
+    
     def find_by_birthday(address_book, birthday):
         found_contacts = []
         for record in address_book.values():
@@ -68,13 +65,11 @@ class Notion:
         self.text = self._validate_text(text)
         self.hashtags = self._validate_hashtags(hashtags)
 
-    @staticmethod
     def _validate_text(text):
         if not text or len(text) > 280:
             raise ValueError("Текст нотатки не може бути порожнім або перевищувати 280 символів.")
         return text
 
-    @staticmethod
     def _validate_hashtags(hashtags):
         validated_hashtags = []
         pattern = re.compile(r"^#\w+$")
@@ -86,15 +81,13 @@ class Notion:
         return validated_hashtags
 
 class Find:
-    @staticmethod
     def find_by_name(address_book, name):
         found_contacts = []
         for record in address_book.values():
             if record.name.value.lower() == name.lower():
                 found_contacts.append(record)
         return found_contacts
-
-    @staticmethod
+    
     def find_by_phone(address_book, phone):
         found_contacts = []
         for record in address_book.values():
@@ -104,7 +97,6 @@ class Find:
                     break
         return found_contacts
     
-    @staticmethod
     def find_by_birthday(address_book, birthday):
         found_contacts = []
         for record in address_book.values():
