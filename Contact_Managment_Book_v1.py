@@ -88,7 +88,7 @@ class Notion:
 
 class Record:
     def __init__(self, name):
-        self.name = Name(name)
+        self.name = Name(*name.split())
         self.phones = []
         self.birthday = None
         self.notions = []
