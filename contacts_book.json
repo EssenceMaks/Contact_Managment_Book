@@ -38,8 +38,10 @@
     },
     {
         "name": "Liza Minnelli",
-        "phones": [],
-        "birthday": "12.03.1946"
+        "phones": [
+            "3333366666"
+        ],
+        "birthday": "12.03.1975"
     },
     {
         "name": "James Taylor",

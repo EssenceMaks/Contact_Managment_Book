@@ -85,6 +85,34 @@ class Notion:
                 raise ValueError("Неправильний формат хештегу.")
         return validated_hashtags
 
+class Find:
+    @staticmethod
+    def find_by_name(address_book, name):
+        found_contacts = []
+        for record in address_book.values():
+            if record.name.value.lower() == name.lower():
+                found_contacts.append(record)
+        return found_contacts
+
+    @staticmethod
+    def find_by_phone(address_book, phone):
+        found_contacts = []
+        for record in address_book.values():
+            for record_phone in record.phones:
+                if str(record_phone) == phone:
+                    found_contacts.append(record)
+                    break
+        return found_contacts
+    
+    @staticmethod
+    def find_by_birthday(address_book, birthday):
+        found_contacts = []
+        for record in address_book.values():
+            if record.birthday and str(record.birthday) == birthday:
+                found_contacts.append(record)
+        return found_contacts
+
+
 class Record:
     def __init__(self, name):
         self.name = Name(*name.split())
@@ -236,6 +264,13 @@ class AddressBook(UserDict):
                     break  # Зупиняємо, якщо знайдено хештег
         return sorted(sorted_records, key=lambda x: x.lower())
 
+    def all_names(self):
+            formatted_names = []
+            for name in self.data.keys():
+                formatted_name = ' '.join([part.capitalize() for part in name.split()])
+                formatted_names.append(formatted_name)
+            return formatted_names
+
     def birthdays(self):
         today = datetime.datetime.now()
         birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []}
@@ -307,6 +342,7 @@ def main():
     book = AddressBook()
 
     while True:
+
         command = input("\nДоступні команди:\n"
                         "hello                           -- для допомоги\n"
                         "add [ім'я] [телефон]            -- для додавання контакту\n"
@@ -329,6 +365,8 @@ def main():
                         "load [файл.json]                -- для завантаження контактів з файлу JSON\n"
                         "q /good bye/close/exit/quit     -- для виходу з програми\n"
                         "\nВведіть команду:").strip().lower()
+
+
         if command in ['q', 'good bye', 'close', 'exit', 'quit']:
             break
         elif command == 'hello':
@@ -463,6 +501,15 @@ def main():
             for record in book.data.values():
                 print(record)
 
+        elif command == 'all-names':
+            existing_names = book.all_names()
+            if existing_names:
+                print("Existing contact names:")
+                for name in existing_names:
+                    print(name)
+            else:
+                print("No contacts found.")
+
         elif command == 'add-birthday':
             name = input("Введіть ім'я контакту: ").strip().lower()
             birthday = input("Введіть день народження (ДД.ММ.РРРР): ").strip()
@@ -519,6 +566,36 @@ def main():
                     print(contact)
             else:
                 print("Контакти не знайдено.")
+
+        elif command == 'find-name':
+            name_to_find = input("Enter name to find: ")
+            found_contacts = Find.find_by_name(book, name_to_find)
+            if found_contacts:
+                print("Found contacts:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("No contacts found.")
+
+        elif command == 'find-phone':
+            phone_to_find = input("Enter phone number to find: ")
+            found_contacts = Find.find_by_phone(book, phone_to_find)
+            if found_contacts:
+                print("Found contacts:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("No contacts found.")
+
+        elif command == 'find-birth':
+            birthday_to_find = input("Enter birthday to find (dd.mm.yyyy): ")
+            found_contacts = Find.find_by_birthday(book, birthday_to_find)
+            if found_contacts:
+                print("Found contacts:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("No contacts found.")
 
         elif command == 'save':
             filename = input("Введіть ім'я файлу для збереження (наприклад, contacts.json): ").strip()
