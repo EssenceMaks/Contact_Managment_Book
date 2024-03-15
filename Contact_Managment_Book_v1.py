@@ -117,6 +117,8 @@ class Record:
         self.data[record.name.value.lower()] = record
 
     def delete(self, name):
+        pass
+
     def display_phones(self):
         for i, phone in enumerate(self.phones):
             print(f"{i}: {phone.value}")
