@@ -1,0 +1,92 @@
+[
+    {
+        "name": "Eddy",
+        "phones": [
+            "7777788888"
+        ],
+        "birthday": "11.03.1988",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Sharon Stone",
+        "phones": [],
+        "birthday": "10.03.1958",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Chuck Norris",
+        "phones": [],
+        "birthday": "10.03.1940",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Tdy Gib",
+        "phones": [],
+        "birthday": "16.03.1958",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Joel Oste",
+        "phones": [],
+        "birthday": "16.03.1963",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Matt Luc",
+        "phones": [],
+        "birthday": "17.03.1974",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Mitt Romney",
+        "phones": [],
+        "birthday": "12.03.1947",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Liza Minnelli",
+        "phones": [
+            "3333366666"
+        ],
+        "birthday": "12.03.1975",
+        "notions": [],
+        "addresses": [
+            "NewYork"
+        ]
+    },
+    {
+        "name": "James Taylor",
+        "phones": [],
+        "birthday": "12.03.1948",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Billy Crystal",
+        "phones": [],
+        "birthday": "14.03.1948",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Michael Caine",
+        "phones": [],
+        "birthday": "14.03.1933",
+        "notions": [],
+        "addresses": []
+    },
+    {
+        "name": "Eva Mendes",
+        "phones": [],
+        "birthday": "05.03.1974",
+        "notions": [],
+        "addresses": []
+    }
+]

@@ -3,6 +3,32 @@ import datetime
 import re
 from collections import UserDict
 
+class Address:
+    def __init__(self, address):
+        if len(address) <= 120:
+            self.addresses = [address]
+        else:
+            raise ValueError("Address exceeds the maximum allowed length of 120 symbols.")
+
+    def add_address(self, address):
+        if isinstance(address, str):
+            self.addresses.append(address)
+        else:
+            print("Invalid address format. Please provide a string.")
+
+    def show_address(self, name):
+        if self.addresses:
+            return f"{name}'s address is {self.addresses[0]}"
+        else:
+            return "No address was provided"
+            
+    def edit_address(self, new_address):
+        self.addresses = [new_address]
+        return "Address has been successfully edited"
+
+    def delete_address(self, address):
+        self.addresses = [a for a in self.addresses if str(a) != str(address)]
+
 class Field:
     def __init__(self, value):
         self.value = value
@@ -107,10 +133,12 @@ class Find:
 
 class Record:
     def __init__(self, name):
+        self.original_name = name
         self.name = Name(*name.split())
         self.phones = []
         self.birthday = None
         self.notions = []
+        self.address = None
 
     def add_phone(self, phone):
         try:
@@ -187,7 +215,8 @@ class Record:
         phones_str = '; '.join([str(phone) for phone in self.phones])
         birthday_str = self.show_birthday() if self.birthday else "День народження не встановлено"
         notions_str = '; '.join([f"{notion.text} (Хештеги: {' '.join(notion.hashtags)})" for notion in self.notions])
-        return f"Ім'я контакту: {self.name.value}, Телефони: {phones_str}, День народження: {birthday_str}, Нотатки: {notions_str}"
+        address_str = ', '.join(self.address.addresses) if hasattr(self, 'address') and self.address else "Адреса не встановлена"
+        return f"Ім'я контакту: {self.original_name}, Телефони: {phones_str}, День народження: {birthday_str}, Нотатки: {notions_str}, Адреса: {address_str}"
 
     def add_hashtag_to_notion(self, notion_index, hashtag):
         try:
@@ -217,6 +246,21 @@ class Record:
         except ValueError as e:
             print("Помилка при видаленні хештегу:", e)
 
+    def add_address(self, address):
+        self.address = Address(address)
+
+    def edit_address(self, new_address):
+        self.address.edit_address(new_address)
+
+    def delete_address(self, address):
+        self.address = None
+    
+    def show_address(self):
+        if self.address:
+            return self.address.show_address(self.name.value)
+        else:
+            return "No address found"
+
 class AddressBook(UserDict):
     def __init__(self):
         super().__init__()
@@ -224,7 +268,8 @@ class AddressBook(UserDict):
         self.load_from_json()
 
     def add_record(self, record):
-        self.data[record.name.value.lower()] = record
+        key = record.name.value.lower()
+        self.data[key] = record
 
     def find(self, name):
         name_lower = name.lower()
@@ -293,6 +338,18 @@ class AddressBook(UserDict):
                 upcoming_birthdays.extend(names)
 
         return upcoming_birthdays
+    
+    def edit_address(self, name, new_address):
+        name_key = name.lower()
+        if name_key in self.data:
+            record = self.data[name_key]
+            if record.address:
+                record.address.edit_address(new_address)
+                print(f"Address for {name} has been successfully edited to {new_address}.")
+            else:
+                print(f"No address has been added to {name} yet.")
+        else:
+            print(f"Contact {name} not found.")
 #_______________________________________________________________________________________________________________________________
     def save_to_json(self, filename="contacts_book.json"):
         with open(filename, 'w') as f:
@@ -302,11 +359,12 @@ class AddressBook(UserDict):
                     'name': str(record.name),
                     'phones': [str(phone) for phone in record.phones],
                     'birthday': str(record.birthday) if record.birthday else None,
-                    'notions': [{'text': notion.text, 'hashtags': notion.hashtags} for notion in record.notions]
+                    'notions': [{'text': notion.text, 'hashtags': notion.hashtags} for notion in record.notions],
+                    "addresses": record.address.addresses if record.address else []
                 }
                 json_data.append(record_data)
             json.dump(json_data, f, ensure_ascii=False, indent=4)
-        print("Дані успішно збережено у файлі " + filename + ".")
+        return "Дані успішно збережено у файлі " + filename + "."
 
     def load_from_json(self, filename="contacts_book.json"):
         try:
@@ -323,6 +381,10 @@ class AddressBook(UserDict):
                     for notion_data in record_data.get("notions", []):
                         hashtags = ' '.join(notion_data["hashtags"])
                         record.add_notion(notion_data["text"], hashtags)
+                    addresses = record_data.get("addresses", [])
+                    if addresses:
+                        for address in addresses:
+                            record.add_address(address)
                     self.add_record(record)
             print("Дані успішно завантажено з файлу " + filename + ".")
         except FileNotFoundError:
@@ -353,6 +415,10 @@ def main():
                         "delete-notion [ім'я] [індекс]   -- для видалення нотатки\n"
                         "add-hashtag [ім'я] [індекс нотатки] [хештег] -- для додавання хештегу до нотатки\n"
                         "remove-hashtag [ім'я] [індекс нотатки] [хештег] -- для видалення хештегу з нотатки\n"
+                        "add-address [ім'я]              -- to add an address to a contact\n"
+                        "edit-address [ім'я]             -- to edit the contacts's address\n"
+                        "show-address [ім'я]             -- to show the contact's address\n"
+                        "delete-address [ім'я]           -- to delete the contact's address\n"
                         "save [файл.json]                -- для збереження контактів у файл JSON\n"
                         "load [файл.json]                -- для завантаження контактів з файлу JSON\n"
                         "q /good bye/close/exit/quit     -- для виходу з програми\n"
@@ -589,10 +655,67 @@ def main():
             else:
                 print("No contacts found.")
 
+        elif command == 'add-address':
+            name = input("Enter the name of the contact you want to add the address to: ")
+            name_key = name.lower()
+            if name_key in book:
+                address = input("Enter the address: ").strip()
+                record = book[name_key]
+                record.add_address(address)
+                print(f"Address {address} added to contact {name} successfully!")
+            else:
+                print(f"Contact {name} not found.")
+
+        elif command == "show-address":
+            name = input("Enter the name of the contact whose address you want to see: ")
+            name_key = name.lower()
+            if name_key in book:
+                record = book[name_key]
+                if record.address:
+                    print(record.address.show_address(record.name.value))
+                else:
+                    print("Address for this contact has not been added yet or has been deleted")
+            else:
+                print("Contact not found")
+
+        elif command == "edit-address":
+            name = input("Enter the name of the contact whose address you want to change: ")
+            name_key = name.lower()
+            if name_key in book:
+                record = book[name_key]
+                if record.address:
+                    new_address = input("Enter the new address: ")
+                    result = book.edit_address(name, new_address)
+                    if result is not None:
+                        print(result)
+                else:
+                    print(f"No address has been added to {name} yet.")
+
+        elif command == "delete-address":
+            name = input("Enter the name of the contact whose address you want to delete: ")
+            name_key = name.lower()
+            if name_key in book:
+                record = book[name_key]
+                if record.address:
+                    record.delete_address(record.address.show_address(name))
+                    print(f"Address for {name} has been successfully deleted.")
+                else:
+                    print(f"No address was provided for {name}.")
+            else:
+                print(f"Contact {name} not found.")
+
         elif command == 'save':
-            filename = input("Введіть ім'я файлу для збереження (наприклад, contacts.json): ").strip()
-            book.save_to_json(filename)
-            print("Контакти успішно збережено!")
+            while True:
+                filename = input("Введіть ім'я файлу для збереження (наприклад, contacts.json): ").strip()
+                if not filename:
+                    print("\n Не введено ім'я файлу. \n Використовується стандартне ім'я 'contacts_book.json'.")
+                    filename = "contacts_book.json"
+                try:
+                    book.save_to_json(filename)
+                    print(f"\n Контакти успішно збережено у файлі {filename}.")
+                    break
+                except Exception as e:
+                    print(f"Виникла помилка при збереженні файлу: {e}.")
 
         elif command == 'load':
             filename = input("Введіть ім'я файлу для завантаження (наприклад, contacts.json): ").strip()
