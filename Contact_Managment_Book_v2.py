@@ -393,7 +393,7 @@ class AddressBook(UserDict):
                 record_data = {
                     'name': str(record.name),
                     'phones': [str(phone) for phone in record.phones],
-                    "email": str(record.email),
+                    "email": str(record.email) if record.email else None,
                     'birthday': str(record.birthday) if record.birthday else None,
                     'notions': [{'text': notion.text, 'hashtags': notion.hashtags} for notion in record.notions],
                     "addresses": record.address.addresses if record.address else []
@@ -450,7 +450,7 @@ def main():
                         "add-birthday [ім'я] [дата]      -- для додавання дня народження\n"
                         "show-birthday [ім'я]            -- для відображення дня народження\n"
                         "birthdays                       -- для відображення майбутніх днів народження\n"
-                        "find-name [ім'я]                -- для пошуку за іменем\n"
+                        "find-name [ім'я]                -- для пошуку за ім'ям\n"
                         "find-phone [телефон]            -- для пошуку за телефоном\n"
                         "find-birth [дата]               -- для пошуку за днем народження\n"
                         "add-notion [ім'я] [текст] [хештеги] -- для додавання нотатки\n"
@@ -458,15 +458,14 @@ def main():
                         "delete-notion [ім'я] [індекс]   -- для видалення нотатки\n"
                         "add-hashtag [ім'я] [індекс нотатки] [хештег] -- для додавання хештегу до нотатки\n"
                         "remove-hashtag [ім'я] [індекс нотатки] [хештег] -- для видалення хештегу з нотатки\n"
-                        "add-address [ім'я]              -- to add an address to a contact\n"
-                        "edit-address [ім'я]             -- to edit the contacts's address\n"
-                        "show-address [ім'я]             -- to show the contact's address\n"
-                        "delete-address [ім'я]           -- to delete the contact's address\n"
+                        "add-address [ім'я]              -- для додавання адреси\n"
+                        "show-address [ім'я]             -- для відображення адреси\n"
+                        "edit-address [ім'я]             -- для редагування адреси\n"
+                        "delete-address [ім'я]           -- для видалення адреси\n"
                         "save [файл.json]                -- для збереження контактів у файл JSON\n"
                         "load [файл.json]                -- для завантаження контактів з файлу JSON\n"
                         "q /good bye/close/exit/quit     -- для виходу з програми\n"
                         "\nВведіть команду:").strip().lower()
-
 
         if command in ['q', 'good bye', 'close', 'exit', 'quit']:
             break
