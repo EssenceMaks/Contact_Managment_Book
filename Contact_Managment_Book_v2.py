@@ -71,29 +71,7 @@ class Birthday(Field):
     def __str__(self):
         return self.value.strftime('%d.%m.%Y')
 
-class Find:
-    def find_by_name(address_book, name):
-        found_contacts = []
-        for record in address_book.values():
-            if record.name.value.lower() == name.lower():
-                found_contacts.append(record)
-        return found_contacts  
 
-    def find_by_phone(address_book, phone):
-        found_contacts = []
-        for record in address_book.values():
-            for record_phone in record.phones:
-                if str(record_phone) == phone:
-                    found_contacts.append(record)
-                    break
-        return found_contacts
-    
-    def find_by_birthday(address_book, birthday):
-        found_contacts = []
-        for record in address_book.values():
-            if record.birthday and str(record.birthday) == birthday:
-                found_contacts.append(record)
-        return found_contacts
 
 class Notion:
     def __init__(self, text, hashtags):
@@ -116,13 +94,15 @@ class Notion:
         return validated_hashtags
 
 class Find:
+    @staticmethod
     def find_by_name(address_book, name):
         found_contacts = []
         for record in address_book.values():
             if record.name.value.lower() == name.lower():
                 found_contacts.append(record)
         return found_contacts
-    
+
+    @staticmethod
     def find_by_phone(address_book, phone):
         found_contacts = []
         for record in address_book.values():
@@ -131,7 +111,8 @@ class Find:
                     found_contacts.append(record)
                     break
         return found_contacts
-    
+
+    @staticmethod
     def find_by_birthday(address_book, birthday):
         found_contacts = []
         for record in address_book.values():
