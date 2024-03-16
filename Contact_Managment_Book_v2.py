@@ -42,6 +42,7 @@ class Name(Field):
             super().__init__(f"{first_name} {last_name}")
         else:
             super().__init__(first_name)
+
 class Phone(Field):
     def __init__(self, value):
         if self._validate_phone(value):
@@ -51,6 +52,14 @@ class Phone(Field):
 
     def _validate_phone(self,value):
         return len(value) == 10 and value.isdigit()
+
+class Email(Field):
+    def __init__(self, value):
+        self.pattern = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
+        if self.pattern.match(value):
+            self.value = value
+        else:
+            raise ValueError("Неіснуючий формат адреси електронної пошти.\nПовторіть спробу.")
 
 class Birthday(Field):
     def __init__(self, value):
@@ -136,6 +145,7 @@ class Record:
         self.original_name = name
         self.name = Name(*name.split())
         self.phones = []
+        self.email = None
         self.birthday = None
         self.notions = []
         self.address = None
@@ -177,6 +187,31 @@ class Record:
                 return p
         return None
 
+    def add_email(self, email):
+        self.email = Email(email)
+
+    def show_email(self):
+        if self.email:
+            return str(self.email)
+        else:
+            return "Електронна пошта не додана."
+
+    def edit_email(self, new_email):
+        if self.email is not None:
+            self.email = Email(new_email)
+        else:
+            self.add_email(new_email)
+
+    def delete_email(self, email_address):
+        if self.email is not None:
+            if self.email.value == email_address:
+                self.email = None
+                print("Електронну пошту успішно видалено!")
+            else:
+                print("Електронна пошта не знайдена.")
+        else:
+            print("Контакт не має електронної пошти для видалення.")
+
     def add_birthday(self, birthday):
         self.birthday = Birthday(birthday)
 
@@ -216,7 +251,7 @@ class Record:
         birthday_str = self.show_birthday() if self.birthday else "День народження не встановлено"
         notions_str = '; '.join([f"{notion.text} (Хештеги: {' '.join(notion.hashtags)})" for notion in self.notions])
         address_str = ', '.join(self.address.addresses) if hasattr(self, 'address') and self.address else "Адреса не встановлена"
-        return f"Ім'я контакту: {self.original_name}, Телефони: {phones_str}, День народження: {birthday_str}, Нотатки: {notions_str}, Адреса: {address_str}"
+        return f"Ім'я контакту: {self.original_name}, Телефони: {phones_str}, Електронна пошта: {self.show_email()}, День народження: {birthday_str}, Нотатки: {notions_str}, Адреса: {address_str}"
 
     def add_hashtag_to_notion(self, notion_index, hashtag):
         try:
@@ -358,6 +393,7 @@ class AddressBook(UserDict):
                 record_data = {
                     'name': str(record.name),
                     'phones': [str(phone) for phone in record.phones],
+                    "email": str(record.email),
                     'birthday': str(record.birthday) if record.birthday else None,
                     'notions': [{'text': notion.text, 'hashtags': notion.hashtags} for notion in record.notions],
                     "addresses": record.address.addresses if record.address else []
@@ -375,6 +411,9 @@ class AddressBook(UserDict):
                     record = Record(record_data["name"])
                     for phone in record_data.get("phones", []):
                         record.add_phone(phone)
+                    email = record_data.get("email")
+                    if email:
+                        record.add_email(email)
                     birthday = record_data.get("birthday")
                     if birthday:
                         record.add_birthday(birthday)
@@ -404,6 +443,10 @@ def main():
                         "phone [ім'я]                    -- для отримання номера телефону\n"
                         "delete [ім'я]                   -- для видалення контакту\n"
                         "all                             -- для відображення всіх контактів\n"
+                        "add-email [ім'я] [email]        -- для додавання електронної пошти\n"
+                        "show-email [ім'я]               -- для відображення електронної пошти\n"
+                        "change-email [ім'я] [email]     -- для заміни електронної пошти\n"
+                        "delete-email [ім'я] [email]     -- для видалення електронної пошти\n"
                         "add-birthday [ім'я] [дата]      -- для додавання дня народження\n"
                         "show-birthday [ім'я]            -- для відображення дня народження\n"
                         "birthdays                       -- для відображення майбутніх днів народження\n"
@@ -558,7 +601,8 @@ def main():
         elif command == 'all':
             for record in book.data.values():
                 print(record)
-
+                
+        # Цієї команди all-names немає в "Доступні команди:" - можливо вона взагалі не потрібна
         elif command == 'all-names':
             existing_names = book.all_names()
             if existing_names:
@@ -567,6 +611,55 @@ def main():
                     print(name)
             else:
                 print("No contacts found.")
+        
+        elif command == 'add-email':
+            name = input("Введіть ім'я контакту: ").strip().lower()
+            email = input("Введіть адресу електронної пошти: ").strip()
+            if name in book.data:
+                try:
+                    book.data[name].add_email(email)
+                except ValueError:
+                    print("Неіснуючий формат адреси електронної пошти.\nПовторіть спробу.")
+                else:
+                    print(f"Додано адресу електронної пошти для контакту {book.data[name].name.value}!")
+            else:
+                print("Контакт не знайдено!")
+
+        elif command == 'show-email':
+            name = input("Введіть ім'я контакту: ").strip().lower()
+            if name in book.data:
+                print(f"Email for {book.data[name].name.value}: {book.data[name].show_email()}")
+            else:
+                print("Контакт не знайдено!")
+
+        elif command == 'change-email':
+            name = input("Введіть ім'я контакту: ").strip().lower()
+            if name in book.data:
+                contact = book.data[name]
+                if contact.email:
+                    new_email = input("Введіть нову адресу електронної пошти: ").strip()
+                    try:
+                        contact.edit_email(new_email)
+                    except ValueError:
+                        print("Неіснуючий формат адреси електронної пошти.\nПовторіть спробу")
+                    else:
+                        print(f"Змінено адресу електронної пошти для контакту {book.data[name].name.value}!")
+                else:
+                    print("Контакт не має електронної адреси для редагування.")
+            else:
+                print("Контакт не знайдено!")
+
+        elif command == "delete-email":
+            name = input("Введіть ім'я контакту: ").strip().lower()
+            if name in book:
+                record = book[name]
+                if record.email is not None:
+                    email_to_delete = email
+                    record.delete_email(email_to_delete)
+                else:
+                    print(f"Для {name} не надано електронної пошти.")
+            else:
+                print(f"Контакт {name} не знайдено!")
 
         elif command == 'add-birthday':
             name = input("Введіть ім'я контакту: ").strip().lower()
