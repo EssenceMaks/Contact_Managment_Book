@@ -705,7 +705,18 @@ def main():
                 print(f"Contact {name} not found.")
 
         elif command == 'save':
-            filename = input("Введіть ім'я файлу для збереження (наприклад, contacts.json): ").strip()
+            while True:
+                filename = input("Введіть ім'я файлу для збереження (наприклад, contacts.json): ").strip()
+                if not filename:
+                    print("Не введено ім'я файлу. Використовується стандартне ім'я 'contacts_book.json'.")
+                    filename = "contacts_book.json"
+                try:
+                    book.save_to_json(filename)
+                    print(f"Контакти успішно збережено у файлі {filename}.")
+                    break
+                except Exception as e:
+                    print(f"Виникла помилка при збереженні файлу: {e}.")
+
             book.save_to_json(filename)
             print("Контакти успішно збережено!")
 

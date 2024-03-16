@@ -11,7 +11,7 @@
     {
         "name": "Sharon Stone",
         "phones": [],
-        "birthday": "10.03.1958",
+        "birthday": null,
         "notions": [],
         "addresses": []
     },
@@ -63,10 +63,14 @@
     },
     {
         "name": "James Taylor",
-        "phones": [],
-        "birthday": "12.03.1948",
+        "phones": [
+            "1111122222"
+        ],
+        "birthday": null,
         "notions": [],
-        "addresses": []
+        "addresses": [
+            "USA"
+        ]
     },
     {
         "name": "Billy Crystal",
@@ -80,7 +84,9 @@
         "phones": [],
         "birthday": "14.03.1933",
         "notions": [],
-        "addresses": []
+        "addresses": [
+            "Canada"
+        ]
     },
     {
         "name": "Eva Mendes",
