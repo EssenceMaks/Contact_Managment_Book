@@ -6,7 +6,9 @@
         ],
         "birthday": "11.03.1988",
         "notions": [],
-        "addresses": []
+        "addresses": [
+            "New York"
+        ]
     },
     {
         "name": "Sharon Stone",
@@ -90,12 +92,12 @@
     {
         "name": "YARA",
         "phones": [
-            "6765819847"
+            "1231231231"
         ],
-        "birthday": "19.09.2000",
+        "birthday": null,
         "notions": [],
         "addresses": [
-            "Zoryana"
+            "Vienna"
         ]
     }
 ]

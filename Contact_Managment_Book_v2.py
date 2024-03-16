@@ -364,7 +364,7 @@ class AddressBook(UserDict):
                 }
                 json_data.append(record_data)
             json.dump(json_data, f, ensure_ascii=False, indent=4)
-        print("Дані успішно збережено у файлі " + filename + ".")
+        return "Дані успішно збережено у файлі " + filename + "."
 
     def load_from_json(self, filename="contacts_book.json"):
         try:
@@ -716,9 +716,6 @@ def main():
                     break
                 except Exception as e:
                     print(f"Виникла помилка при збереженні файлу: {e}.")
-
-            book.save_to_json(filename)
-            print("Контакти успішно збережено!")
 
         elif command == 'load':
             filename = input("Введіть ім'я файлу для завантаження (наприклад, contacts.json): ").strip()
