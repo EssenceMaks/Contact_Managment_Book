@@ -477,14 +477,30 @@ def main():
         elif command == 'hello':
             print("Привіт! Як я можу допомогти вам?")
         
+        # elif command == 'add':
+        #     name = input("Введіть ім'я контакту: ").strip()
+        #     phone = input("Введіть номер телефону: ").strip()
+        #     record = Record(name)
+        #     record.add_phone(phone)
+        #     book.add_record(record)
+        #     print(f"Контакт {name} додано успішно!")
+
         elif command == 'add':
             name = input("Введіть ім'я контакту: ").strip()
-            phone = input("Введіть номер телефону: ").strip()
-            record = Record(name)
-            record.add_phone(phone)
-            book.add_record(record)
-            print(f"Контакт {name} додано успішно!")
+            name_match = name.lower()
+            if name_match in book.data:
+                print(f"Контакт з ім'ям '{name}' вже існує. Будь ласка, повторіть команду 'add' та введіть інше ім'я.")
+            else:
+                while True:
+                    phone = input("Введіть номер телефону: ").strip()
+                    if phone:
+                        break
+                record = Record(name)
+                record.add_phone(phone)
+                book.add_record(record)
+                print(f"Контакт '{name}' додано успішно!")
 
+                
         elif command.startswith("add-notion "):
             parts = command.split(" ", 3)
             if len(parts) >= 4:
