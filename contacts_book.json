@@ -1,106 +1,374 @@
 [
     {
-        "name": "Eddy",
+        "name": "Dmytro Terokhin",
         "phones": [
-            "7777788888"
+            "0633446574"
         ],
-        "email": null,
-        "birthday": "11.03.1988",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Sharon Stone",
-        "phones": [],
-        "email": null,
-        "birthday": "10.03.1958",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Chuck Norris",
-        "phones": [],
-        "email": null,
-        "birthday": "10.03.1940",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Tdy Gib",
-        "phones": [],
-        "email": null,
-        "birthday": "16.03.1958",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Joel Oste",
-        "phones": [],
-        "email": null,
-        "birthday": "16.03.1963",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Matt Luc",
-        "phones": [],
-        "email": null,
-        "birthday": "17.03.1974",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Mitt Romney",
-        "phones": [],
-        "email": null,
-        "birthday": "12.03.1947",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Liza Minnelli",
-        "phones": [
-            "3333366666"
-        ],
-        "email": null,
-        "birthday": "12.03.1975",
+        "email": "dxin00@gmail.com",
+        "birthday": "25.08.1990",
         "notions": [],
         "addresses": [
-            "NewYork"
+            "85 BROAD ST FL 5 NEW YORK NY 10004-1789 USA"
         ]
     },
     {
-        "name": "James Taylor",
-        "phones": [],
-        "email": null,
-        "birthday": "12.03.1948",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Billy Crystal",
-        "phones": [],
-        "email": null,
-        "birthday": "14.03.1948",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Michael Caine",
-        "phones": [],
-        "email": null,
-        "birthday": "14.03.1933",
-        "notions": [],
-        "addresses": []
-    },
-    {
-        "name": "Eva Mendes",
-        "phones": [],
-        "email": "em@gmail.com",
-        "birthday": "05.03.1974",
+        "name": "Eva Green",
+        "phones": [
+            "1234567890"
+        ],
+        "email": "eva.green@example.com",
+        "birthday": "14.03.1980",
         "notions": [],
         "addresses": [
-            "Spaine"
+            "123 Hilltop Rd, Los Angeles, CA 90001, USA"
+        ]
+    },
+    {
+        "name": "John Smith",
+        "phones": [
+            "9876543210"
+        ],
+        "email": "john.smith@example.com",
+        "birthday": "15.03.1975",
+        "notions": [],
+        "addresses": [
+            "456 Maple Ave, Chicago, IL 60601, USA"
+        ]
+    },
+    {
+        "name": "Alice Johnson",
+        "phones": [
+            "5556667777"
+        ],
+        "email": "alice.johnson@example.com",
+        "birthday": "16.03.1992",
+        "notions": [],
+        "addresses": [
+            "789 Oak St, San Francisco, CA 94102, USA"
+        ]
+    },
+    {
+        "name": "Maximilian Wagner",
+        "phones": [
+            "1010101010"
+        ],
+        "email": "max.wagner@example.com",
+        "birthday": "17.03.1985",
+        "notions": [],
+        "addresses": [
+            "321 Pine Ln, Seattle, WA 98101, USA"
+        ]
+    },
+    {
+        "name": "Sophie Brown",
+        "phones": [
+            "9998887777"
+        ],
+        "email": "sophie.brown@example.com",
+        "birthday": "18.03.1998",
+        "notions": [],
+        "addresses": [
+            "567 Elm St, Boston, MA 02101, USA"
+        ]
+    },
+    {
+        "name": "Daniel Lee",
+        "phones": [
+            "4443332222"
+        ],
+        "email": "daniel.lee@example.com",
+        "birthday": "19.03.1989",
+        "notions": [],
+        "addresses": [
+            "234 Cedar Ave, Miami, FL 33101, USA"
+        ]
+    },
+    {
+        "name": "Emily Rodriguez",
+        "phones": [
+            "7778889999"
+        ],
+        "email": "emily.rodriguez@example.com",
+        "birthday": "20.03.1983",
+        "notions": [],
+        "addresses": [
+            "876 Willow St, Dallas, TX 75201, USA"
+        ]
+    },
+    {
+        "name": "David Kim",
+        "phones": [
+            "2223334444"
+        ],
+        "email": "david.kim@example.com",
+        "birthday": "21.03.1976",
+        "notions": [],
+        "addresses": [
+            "543 Birch Rd, Atlanta, GA 30301, USA"
+        ]
+    },
+    {
+        "name": "Isabella Martinez",
+        "phones": [
+            "6667778888"
+        ],
+        "email": "isabella.martinez@example.com",
+        "birthday": "22.03.1995",
+        "notions": [],
+        "addresses": [
+            "765 Pine St, Denver, CO 80201, USA"
+        ]
+    },
+    {
+        "name": "Nathan Turner",
+        "phones": [
+            "3334445555"
+        ],
+        "email": "nathan.turner@example.com",
+        "birthday": "23.03.1982",
+        "notions": [],
+        "addresses": [
+            "432 Walnut Blvd, Houston, TX 77001, USA"
+        ]
+    },
+    {
+        "name": "Olivia White",
+        "phones": [
+            "8889990000"
+        ],
+        "email": "olivia.white@example.com",
+        "birthday": "24.03.1990",
+        "notions": [],
+        "addresses": [
+            "654 Maple Ave, Las Vegas, NV 89101, USA"
+        ]
+    },
+    {
+        "name": "Lucas Anderson",
+        "phones": [
+            "7776665555"
+        ],
+        "email": "lucas.anderson@example.com",
+        "birthday": "25.03.1987",
+        "notions": [],
+        "addresses": [
+            "789 Oak St, San Francisco, CA 94102, USA"
+        ]
+    },
+    {
+        "name": "Emma Harris",
+        "phones": [
+            "2221110000"
+        ],
+        "email": "emma.harris@example.com",
+        "birthday": "14.03.1984",
+        "notions": [],
+        "addresses": [
+            "321 Pine Ln, Seattle, WA 98101, USA"
+        ]
+    },
+    {
+        "name": "Alexander King",
+        "phones": [
+            "5554443333"
+        ],
+        "email": "alexander.king@example.com",
+        "birthday": "15.03.1978",
+        "notions": [],
+        "addresses": [
+            "456 Maple Ave, Chicago, IL 60601, USA"
+        ]
+    },
+    {
+        "name": "Sophia Thompson",
+        "phones": [
+            "9998887777"
+        ],
+        "email": "sophia.thompson@example.com",
+        "birthday": "16.03.1993",
+        "notions": [],
+        "addresses": [
+            "567 Elm St, Boston, MA 02101, USA"
+        ]
+    },
+    {
+        "name": "William Walker",
+        "phones": [
+            "1112223333"
+        ],
+        "email": "william.walker@example.com",
+        "birthday": "17.03.1986",
+        "notions": [],
+        "addresses": [
+            "234 Cedar Ave, Miami, FL 33101, USA"
+        ]
+    },
+    {
+        "name": "Ava Carter",
+        "phones": [
+            "6665554444"
+        ],
+        "email": "ava.carter@example.com",
+        "birthday": "18.03.1996",
+        "notions": [],
+        "addresses": [
+            "876 Willow St, Dallas, TX 75201, USA"
+        ]
+    },
+    {
+        "name": "Michael Evans",
+        "phones": [
+            "3332221111"
+        ],
+        "email": "michael.evans@example.com",
+        "birthday": "19.03.1980",
+        "notions": [],
+        "addresses": [
+            "543 Birch Rd, Atlanta, GA 30301, USA"
+        ]
+    },
+    {
+        "name": "Mia Brown",
+        "phones": [
+            "8887776666"
+        ],
+        "email": "mia.brown@example.com",
+        "birthday": "20.03.1992",
+        "notions": [],
+        "addresses": [
+            "654 Pine St, Denver, CO 80201, USA"
+        ]
+    },
+    {
+        "name": "Sophie Turner",
+        "phones": [
+            "3332221111"
+        ],
+        "email": "sophie.turner@example.com",
+        "birthday": "21.03.1987",
+        "notions": [],
+        "addresses": [
+            "321 Oak St, San Francisco, CA 94102, USA"
+        ]
+    },
+    {
+        "name": "Jack Robinson",
+        "phones": [
+            "5556667777"
+        ],
+        "email": "jack.robinson@example.com",
+        "birthday": "22.03.1990",
+        "notions": [],
+        "addresses": [
+            "987 Elm St, Boston, MA 02101, USA"
+        ]
+    },
+    {
+        "name": "Emily White",
+        "phones": [
+            "7778889999"
+        ],
+        "email": "emily.white@example.com",
+        "birthday": "23.03.1985",
+        "notions": [],
+        "addresses": [
+            "345 Maple Ave, Chicago, IL 60601, USA"
+        ]
+    },
+    {
+        "name": "Daniel Johnson",
+        "phones": [
+            "9998887777"
+        ],
+        "email": "daniel.johnson@example.com",
+        "birthday": "24.03.1998",
+        "notions": [],
+        "addresses": [
+            "678 Oak St, Los Angeles, CA 90001, USA"
+        ]
+    },
+    {
+        "name": "Sarah Lee",
+        "phones": [
+            "4443332222"
+        ],
+        "email": "sarah.lee@example.com",
+        "birthday": "25.03.1982",
+        "notions": [],
+        "addresses": [
+            "901 Pine Ln, Seattle, WA 98101, USA"
+        ]
+    },
+    {
+        "name": "Samuel Johnson",
+        "phones": [
+            "7776665555"
+        ],
+        "email": "samuel.johnson@example.com",
+        "birthday": "26.03.1986",
+        "notions": [],
+        "addresses": [
+            "123 Oak St, San Francisco, CA 94102, USA"
+        ]
+    },
+    {
+        "name": "Jennifer Lopez",
+        "phones": [
+            "1112223333"
+        ],
+        "email": "jennifer.lopez@example.com",
+        "birthday": "27.03.1970",
+        "notions": [],
+        "addresses": [
+            "456 Maple Ave, New York, NY 10001, USA"
+        ]
+    },
+    {
+        "name": "Chris Hemsworth",
+        "phones": [
+            "4445556666"
+        ],
+        "email": "chris.hemsworth@example.com",
+        "birthday": "28.03.1983",
+        "notions": [],
+        "addresses": [
+            "789 Elm St, Los Angeles, CA 90001, USA"
+        ]
+    },
+    {
+        "name": "Natalie Portman",
+        "phones": [
+            "7778889999"
+        ],
+        "email": "natalie.portman@example.com",
+        "birthday": "29.03.1981",
+        "notions": [],
+        "addresses": [
+            "987 Pine Ln, Boston, MA 02101, USA"
+        ]
+    },
+    {
+        "name": "Robert Downey",
+        "phones": [
+            "8889990000"
+        ],
+        "email": "robert.downey@example.com",
+        "birthday": "30.03.1965",
+        "notions": [],
+        "addresses": [
+            "654 Oak St, Seattle, WA 98101, USA"
+        ]
+    },
+    {
+        "name": "Scarlett Johansson",
+        "phones": [
+            "5554443333"
+        ],
+        "email": "scarlett.johansson@example.com",
+        "birthday": "31.03.1984",
+        "notions": [],
+        "addresses": [
+            "321 Pine Ave, Los Angeles, CA 90001, USA"
         ]
     }
 ]
