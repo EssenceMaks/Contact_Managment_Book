@@ -550,8 +550,7 @@ def command_line_digital_keys(key, command,book):
                     else:
                         print("Контакт не знайдено.")
                 else:
-                    print(
-                        "Недостатньо аргументів. Використовуйте формат: delete-notion [ім'я] [індекс]")
+                    print("Недостатньо аргументів. Використовуйте формат: delete-notion [ім'я] [індекс]")
 
         def command_add_hashtag(): 
             if command.startswith("add-hashtag "):
@@ -565,8 +564,7 @@ def command_line_digital_keys(key, command,book):
                     else:
                         print("Контакт не знайдено.")
                 else:
-                    print(
-                        "Недостатньо аргументів. Використовуйте формат: add-hashtag [ім'я] [індекс нотатки] [хештег]")
+                    print("Недостатньо аргументів. Використовуйте формат: add-hashtag [ім'я] [індекс нотатки] [хештег]")
 
         def command_remove_hashtag():
             if command.startswith("remove-hashtag "):
@@ -581,8 +579,7 @@ def command_line_digital_keys(key, command,book):
                     else:
                         print("Контакт не знайдено.")
                 else:
-                    print(
-                        "Недостатньо аргументів. Використовуйте формат: remove-hashtag [ім'я] [індекс нотатки] [хештег]")
+                    print("Недостатньо аргументів. Використовуйте формат: remove-hashtag [ім'я] [індекс нотатки] [хештег]")
 
         def command_phone():
             name = input("Введіть ім'я контакту: ").strip().lower()

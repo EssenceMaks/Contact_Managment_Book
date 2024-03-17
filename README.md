@@ -1,5 +1,5 @@
 # command_line_release
-# release from 17.03.2024
+# release from 18.03.2024
 
 # Моє виконня:
 # 3-я ітерація.
