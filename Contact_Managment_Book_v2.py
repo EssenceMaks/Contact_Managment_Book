@@ -79,12 +79,12 @@ class Notion:
         self.text = self._validate_text(text)
         self.hashtags = self._validate_hashtags(hashtags)
 
-    def _validate_text(text):
+    def _validate_text(self, text):
         if not text or len(text) > 280:
             raise ValueError("Текст нотатки не може бути порожнім або перевищувати 280 символів.")
         return text
 
-    def _validate_hashtags(hashtags):
+    def _validate_hashtags(self, hashtags):
         validated_hashtags = []
         pattern = re.compile(r"^#\w+$")
         for hashtag in hashtags.split():
@@ -131,6 +131,7 @@ class Record:
         self.birthday = None
         self.notions = []
         self.address = None
+        self.data = {}
 
     def add_phone(self, phone):
         try:
@@ -419,36 +420,36 @@ def command_line_helper(args=None):
         return print("Щоб побачити меню команд введіть h або help")
 
     help = ("\nДоступні команди:\n"
-            "hello                           -- для вітання з ботом\n"
-            "h                               -- для допомоги\n"
-            "help                            -- для допомоги\n"
-            "add [ім'я] [телефон]            -- для додавання контакту\n"
-            "change [ім'я] [індекс] [телефон]-- для зміни номера контакту\n"
-            "phone [ім'я]                    -- для отримання номера телефону\n"
-            "delete [ім'я]                   -- для видалення контакту\n"
-            "all                             -- для відображення всіх контактів\n"
-            "add-email [ім'я] [email]        -- для додавання електронної пошти\n"
-            "show-email [ім'я]               -- для відображення електронної пошти\n"
-            "change-email [ім'я] [email]     -- для заміни електронної пошти\n"
-            "delete-email [ім'я] [email]     -- для видалення електронної пошти\n"
-            "add-birthday [ім'я] [дата]      -- для додавання дня народження\n"
-            "show-birthday [ім'я]            -- для відображення дня народження\n"
-            "birthdays                       -- для відображення майбутніх днів народження\n"
-            "find-name [ім'я]                -- для пошуку за ім'ям\n"
-            "find-phone [телефон]            -- для пошуку за телефоном\n"
-            "find-birth [дата]               -- для пошуку за днем народження\n"
-            "add-notion [ім'я] [текст] [хештеги] -- для додавання нотатки\n"
-            "edit-notion [ім'я] [індекс] [новий текст] [нові хештеги] -- для редагування нотатки\n"
-            "delete-notion [ім'я] [індекс]   -- для видалення нотатки\n"
-            "add-hashtag [ім'я] [індекс нотатки] [хештег] -- для додавання хештегу до нотатки\n"
-            "remove-hashtag [ім'я] [індекс нотатки] [хештег] -- для видалення хештегу з нотатки\n"
-            "add-address [ім'я]              -- для додавання адреси\n"
-            "show-address [ім'я]             -- для відображення адреси\n"
-            "edit-address [ім'я]             -- для редагування адреси\n"
-            "delete-address [ім'я]           -- для видалення адреси\n"
-            "save [файл.json]                -- для збереження контактів у файл JSON\n"
-            "load [файл.json]                -- для завантаження контактів з файлу JSON\n"
-            "q /good bye/close/exit/quit     -- для виходу з програми\n"
+            "hello                                                          -- для вітання з ботом\n"
+            "h                                                              -- для допомоги\n"
+            "help                                                           -- для допомоги\n"
+            "add [ім'я] [телефон]                                           -- для додавання контакту\n"
+            "change [ім'я] [індекс] [телефон]                               -- для зміни номера контакту\n"
+            "phone [ім'я]                                                   -- для отримання номера телефону\n"
+            "delete [ім'я]                                                  -- для видалення контакту\n"
+            "all                                                            -- для відображення всіх контактів\n"
+            "add-email [ім'я] [email]                                       -- для додавання електронної пошти\n"
+            "show-email [ім'я]                                              -- для відображення електронної пошти\n"
+            "change-email [ім'я] [email]                                    -- для заміни електронної пошти\n"
+            "delete-email [ім'я] [email]                                    -- для видалення електронної пошти\n"
+            "add-birthday [ім'я] [дата]                                     -- для додавання дня народження\n"
+            "show-birthday [ім'я]                                           -- для відображення дня народження\n"
+            "birthdays                                                      -- для відображення майбутніх днів народження\n"
+            "find-name [ім'я]                                               -- для пошуку за ім'ям\n"
+            "find-phone [телефон]                                           -- для пошуку за телефоном\n"
+            "find-birth [дата]                                              -- для пошуку за днем народження\n"
+            "add-notion [ім'я] [текст] [хештеги]                            -- для додавання нотатки\n"
+            "edit-notion [ім'я] [індекс] [новий текст] [нові хештеги]       -- для редагування нотатки\n"
+            "delete-notion [ім'я] [індекс]                                  -- для видалення нотатки\n"
+            "add-hashtag [ім'я] [індекс нотатки] [хештег]                   -- для додавання хештегу до нотатки\n"
+            "remove-hashtag [ім'я] [індекс нотатки] [хештег]                -- для видалення хештегу з нотатки\n"
+            "add-address [ім'я]                                             -- для додавання адреси\n"
+            "show-address [ім'я]                                            -- для відображення адреси\n"
+            "edit-address [ім'я]                                            -- для редагування адреси\n"
+            "delete-address [ім'я]                                          -- для видалення адреси\n"
+            "save [файл.json]                                               -- для збереження контактів у файл JSON\n"
+            "load [файл.json]                                               -- для завантаження контактів з файлу JSON\n"
+            "q /good bye/close/exit/quit                                    -- для виходу з програми\n"
             "\nВведіть команду:"
             "\n")
             
@@ -784,9 +785,7 @@ def main():
                 record = book[name_key]
                 if record.address:
                     new_address = input("Enter the new address: ")
-                    result = book.edit_address(name, new_address)
-                    if result is not None:
-                        print(result)
+                    book.edit_address(name, new_address)
                 else:
                     print(f"No address has been added to {name} yet.")
 
