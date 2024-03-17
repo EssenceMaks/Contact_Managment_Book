@@ -2,6 +2,7 @@ import json
 import datetime
 import re
 from collections import UserDict
+import difflib
 
 class Address:
     def __init__(self, address):
@@ -175,7 +176,7 @@ class Record:
         if self.email:
             return str(self.email)
         else:
-            return "Електронна пошта не додана."
+            return "не додана"
 
     def edit_email(self, new_email):
         if self.email is not None:
@@ -200,7 +201,7 @@ class Record:
         if self.birthday:
             return str(self.birthday)
         else:
-            return "День народження не встановлено"
+            return "не додано"
     
     def add_notion(self, text, hashtags):
         self.notions.append(Notion(text, hashtags))
@@ -229,9 +230,9 @@ class Record:
 
     def __str__(self):
         phones_str = '; '.join([str(phone) for phone in self.phones])
-        birthday_str = self.show_birthday() if self.birthday else "День народження не встановлено"
+        birthday_str = self.show_birthday() if self.birthday else "не додано"
         notions_str = '; '.join([f"{notion.text} (Хештеги: {' '.join(notion.hashtags)})" for notion in self.notions])
-        address_str = ', '.join(self.address.addresses) if hasattr(self, 'address') and self.address else "Адреса не встановлена"
+        address_str = ', '.join(self.address.addresses) if hasattr(self, 'address') and self.address else "не додана"
         return f"Ім'я контакту: {self.original_name}, Телефони: {phones_str}, Електронна пошта: {self.show_email()}, День народження: {birthday_str}, Нотатки: {notions_str}, Адреса: {address_str}"
 
     def add_hashtag_to_notion(self, notion_index, hashtag):
@@ -418,7 +419,9 @@ def command_line_helper(args=None):
         return print("Щоб побачити меню команд введіть h або help")
 
     help = ("\nДоступні команди:\n"
-            "hello                           -- для допомоги\n"
+            "hello                           -- для вітання з ботом\n"
+            "h                               -- для допомоги\n"
+            "help                            -- для допомоги\n"
             "add [ім'я] [телефон]            -- для додавання контакту\n"
             "change [ім'я] [індекс] [телефон]-- для зміни номера контакту\n"
             "phone [ім'я]                    -- для отримання номера телефону\n"
@@ -710,7 +713,7 @@ def main():
                 print("Контакти не знайдено.")
 
         elif command == 'find-birth':
-            birthday_to_find = input("Введіть день народження для пошуку (дд.мм.рррр): ")
+            birthday_to_find = input("Введіть день народження для пошуку (ДД.ММ.РРРР): ")
             found_contacts = Find.find_by_birthday(book, birthday_to_find)
             if found_contacts:
                 print("Знайдені контакти:")
@@ -727,8 +730,9 @@ def main():
                 for contact in found_contacts:
                     print(contact)
             else:
-                print("No contacts found.")
+                print("Контакт не знайдено.")
 
+        # Ця command == 'find-phone' - дубль - необхідно видалити
         elif command == 'find-phone':
             phone_to_find = input("Enter phone number to find: ")
             found_contacts = Find.find_by_phone(book, phone_to_find)
@@ -737,8 +741,9 @@ def main():
                 for contact in found_contacts:
                     print(contact)
             else:
-                print("No contacts found.")
+                print("Контакти не знайдено.")
 
+        # Ця command == 'find-birth' - дубль - необхідно видалити
         elif command == 'find-birth':
             birthday_to_find = input("Enter birthday to find (dd.mm.yyyy): ")
             found_contacts = Find.find_by_birthday(book, birthday_to_find)
@@ -747,7 +752,7 @@ def main():
                 for contact in found_contacts:
                     print(contact)
             else:
-                print("No contacts found.")
+                print("Контакти не знайдено.")
 
         elif command == 'add-address':
             name = input("Enter the name of the contact you want to add the address to: ")
@@ -758,7 +763,7 @@ def main():
                 record.add_address(address)
                 print(f"Address {address} added to contact {name} successfully!")
             else:
-                print(f"Contact {name} not found.")
+                print(f"Контакт {name} не знайдено.")
 
         elif command == "show-address":
             name = input("Enter the name of the contact whose address you want to see: ")
@@ -770,7 +775,7 @@ def main():
                 else:
                     print("Address for this contact has not been added yet or has been deleted")
             else:
-                print("Contact not found")
+                print("Контакт не знайдено.")
 
         elif command == "edit-address":
             name = input("Enter the name of the contact whose address you want to change: ")
@@ -796,7 +801,7 @@ def main():
                 else:
                     print(f"No address was provided for {name}.")
             else:
-                print(f"Contact {name} not found.")
+                print(f"Контакт {name} не знайдено.")
 
         elif command == 'save':
             while True:
@@ -817,7 +822,61 @@ def main():
             print("Контакти успішно завантажено!")
 
         else:
-            print("\n Неправильна команда. \nБудь ласка, спробуйте ще раз.")
+            print("\n Неправильна команда.")
+            # print("\n Неправильна команда. \nБудь ласка, спробуйте ще раз.")
+            # Цей print був до того, як з'явилися повідомлення з підказками для невірних команд - його та цей коментар можна видаляти
+
+        # Словник доступних команд
+        available_commands = {
+            "hello": "для вітання з ботом",
+            "h": "для допомоги",
+            "help": "для допомоги",
+            "add": "для додавання контакту",
+            "change": "для зміни номера контакту",
+            "phone": "для отримання номера телефону",
+            "delete": "для видалення контакту",
+            "all": "для відображення всіх контактів",
+            "add-email": "для додавання електронної пошти",
+            "show-email": "для відображення електронної пошти",
+            "change-email": "для заміни електронної пошти",
+            "delete-email": "для видалення електронної пошти",
+            "add-birthday": "для додавання дня народження",
+            "show-birthday": "для відображення дня народження",
+            "birthdays": "для відображення майбутніх днів народження",
+            "find-name": "для пошуку за ім'я",
+            "find-phone": "для пошуку за телефоном",
+            "find-birth": "для пошуку за днем народження",
+            "add-notion": "для додавання нотатки",
+            "edit-notion": "для редагування нотатки",
+            "delete-notion": "для видалення нотатки",
+            "add-hashtag": "для додавання хештегу до нотатки",
+            "remove-hashtag": "для видалення хештегу з нотатки",
+            "add-address": "для додавання адреси",
+            "show-address": "для відображення адреси",
+            "change-address": "для редагування адреси",
+            "delete-address": "для видалення адреси",
+            "save": "для збереження контактів у файл JSON",
+            "load": "для завантаження контактів з файлу JSON",
+            "good bye": "для виходу з програми",
+            "q": "для виходу з програми",
+            "quit": "для виходу з програми",
+            "close": "для виходу з програми",
+            "exit": "для виходу з програми"
+        }
+
+        def suggest_command(user_input):
+            # Пропонує найближчу доступну команду на основі введення користувача
+            matches = difflib.get_close_matches(user_input, available_commands.keys(), n=1, cutoff=0.7)
+            if matches:
+                return f"Мабуть ви мали на увазі: '{matches[0]}' ({available_commands[matches[0]]})? Будь ласка, спробуйте ще раз."
+            else:
+                return "Вибачте, я не зрозумів вашу команду. Спробуйте ще раз або введіть 'h' або 'help' для допомоги."
+
+        if command in available_commands:
+            pass
+        else:
+            suggestion = suggest_command(command)
+            print(suggestion)
 
 
 if __name__ == "__main__":
