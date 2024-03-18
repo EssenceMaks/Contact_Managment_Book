@@ -420,6 +420,7 @@ def command_line_helper(args=None):
         return print("Щоб побачити меню команд введіть h або help")
 
     help = ("\nДоступні команди:\n"
+
             "hello                                                          -- для вітання з ботом\n"
             "h                                                              -- для допомоги\n"
             "help                                                           -- для допомоги\n"
@@ -430,7 +431,7 @@ def command_line_helper(args=None):
             "all                                                            -- для відображення всіх контактів\n"
             "add-email [ім'я] [email]                                       -- для додавання електронної пошти\n"
             "show-email [ім'я]                                              -- для відображення електронної пошти\n"
-            "change-email [ім'я] [email]                                    -- для заміни електронної пошти\n"
+            "edit-email [ім'я] [email]                                    -- для заміни електронної пошти\n"
             "delete-email [ім'я] [email]                                    -- для видалення електронної пошти\n"
             "add-birthday [ім'я] [дата]                                     -- для додавання дня народження\n"
             "show-birthday [ім'я]                                           -- для відображення дня народження\n"
@@ -653,7 +654,7 @@ def main():
             else:
                 print("Контакт не знайдено!")
 
-        elif command == 'change-email':
+        elif command == 'edit-email':
             name = input("Введіть ім'я контакту: ").strip().lower()
             if name in book.data:
                 contact = book.data[name]
@@ -853,7 +854,9 @@ def main():
             "all": "для відображення всіх контактів",
             "add-email": "для додавання електронної пошти",
             "show-email": "для відображення електронної пошти",
-            "change-email": "для заміни електронної пошти",
+
+            "edit-email": "для заміни електронної пошти",
+
             "delete-email": "для видалення електронної пошти",
             "add-birthday": "для додавання дня народження",
             "show-birthday": "для відображення дня народження",
@@ -868,7 +871,9 @@ def main():
             "remove-hashtag": "для видалення хештегу з нотатки",
             "add-address": "для додавання адреси",
             "show-address": "для відображення адреси",
-            "change-address": "для редагування адреси",
+
+            "edit-address": "для редагування адреси",
+
             "delete-address": "для видалення адреси",
             "save": "для збереження контактів у файл JSON",
             "load": "для завантаження контактів з файлу JSON",
@@ -880,12 +885,15 @@ def main():
         }
 
         def suggest_command(user_input):
-            # Пропонує найближчу доступну команду на основі введення користувача
-            matches = difflib.get_close_matches(user_input, available_commands.keys(), n=1, cutoff=0.7)
-            if matches:
-                return f"Мабуть ви мали на увазі: '{matches[0]}' ({available_commands[matches[0]]})? Будь ласка, спробуйте ще раз."
+
+            matches = [command for command in available_commands.keys() if command.startswith(user_input)]
+            if len(matches) == 1:
+                return f"Можливо, ви мали на увазі команду: {matches[0]}?\nБудь ласка, спробуйте ще раз."
+            elif matches:
+                return f"Можливо, ви мали на увазі одну з цих команд: {', '.join(matches)}?\nБудь ласка, спробуйте ще раз."
             else:
                 return "Вибачте, я не зрозумів вашу команду. Спробуйте ще раз або введіть 'h' або 'help' для допомоги."
+
 
         if command in available_commands:
             pass
