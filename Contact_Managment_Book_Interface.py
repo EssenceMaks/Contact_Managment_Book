@@ -371,7 +371,7 @@ class AddressBook(UserDict):
 
     def birthdays(self):
         today = datetime.datetime.now()
-        birthdays_this_week = {'Понеділок': [], 'Вівторок': [], 'Середа': [], 'Четвер': [], 'П"ятинця': [], 'Субота': [], 'Неділя': [], 'Сьогодні': []}
+        birthdays_this_week = {'Понеділок': [], 'Вівторок': [], 'Середа': [], 'Четвер': [], 'П"ятниця': [], 'Субота': [], 'Неділя': [], 'Сьогодні': []}
         from_day_column_width = 18
 
         for record in self.data.values():
@@ -381,7 +381,7 @@ class AddressBook(UserDict):
                 delta_days = (next_birthday - today).days
                 birthday_weekday = next_birthday.strftime('%A')
 
-                if next_birthday < today and (birthday_weekday == 'Субота' or birthday_weekday == 'Неділя') and birthday_weekday != 'П"ятинця' and birthday_weekday != 'Четвер':
+                if next_birthday < today and (birthday_weekday == 'Субота' or birthday_weekday == 'Неділя') and birthday_weekday != 'П"ятниця' and birthday_weekday != 'Четвер':
                     from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)  # Заповнюємо стовпець from
                     birthdays_this_week['Понеділок'].append((record, from_day)) # Додаємо до списку для понеділка
 
