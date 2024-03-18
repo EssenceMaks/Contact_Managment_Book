@@ -414,8 +414,6 @@ class AddressBook(UserDict):
         except json.JSONDecodeError:
             print("Помилка при завантаженні даних. Файл може бути пошкоджений.")
 #_______________________________________________________________________________________________________________________________
-
-
 def command_line_helper(args=None):
     if args is None:
         return print("Щоб побачити меню команд введіть h або help")
@@ -452,8 +450,6 @@ def command_line_helper(args=None):
             "Цифра 28: load [файл.json]                                               -- для завантаження контактів з файлу JSON\n"
             "\nВведіть команду або цифру від 1 до 28 :"
             "\n")
-            
-
     return help
 # _______________________________________________________________________________________________________________________________
 def command_line_digital_keys(key, command,book):
@@ -517,8 +513,7 @@ def command_line_digital_keys(key, command,book):
                     contact.add_phone(phone)
                 else:
                     contact.display_phones()
-                    old_phone_index = input(
-                        "Введіть індекс номеру телефону, який хочете змінити: ")
+                    old_phone_index = input("Введіть індекс номеру телефону, який хочете змінити: ")
                     new_phone = input("Введіть новий номер телефону: ").strip()
                     contact.edit_phone(old_phone_index, new_phone)
             else:
@@ -632,8 +627,7 @@ def command_line_digital_keys(key, command,book):
             for name in upcoming_birthdays:
                 contact = book.find(name)
                 if contact:
-                    phone_number = ", ".join(str(
-                        phone) for phone in contact.phones) if contact.phones else "Немає номеру телефону"
+                    phone_number = ", ".join(str(phone) for phone in contact.phones) if contact.phones else "Немає номеру телефону"
                     print(f"День народження {name} буде на {contact.birthday}, номер для дзвінка {phone_number}")
                 else:
                     print(f"Контакт для {name} не знайдено")
