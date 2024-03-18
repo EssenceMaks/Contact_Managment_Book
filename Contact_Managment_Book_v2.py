@@ -463,7 +463,6 @@ def command_line_helper(args=None):
             "save [файл.json]                                               -- для збереження контактів у файл JSON\n"
             "load [файл.json]                                               -- для завантаження контактів з файлу JSON\n"
             "q /good bye/close/exit/quit                                    -- для виходу з програми\n"
-            "\nВведіть команду:"
             "\n")
             
 
@@ -831,20 +830,20 @@ def main():
                 print("Контакти не знайдено.")
 
         elif command == 'add-address':
-                name = input("Enter the name of the contact you want to add the address to: ")
-                name_key = name.lower()
-                if name_key in book:
-                    while True:
-                        address = input("Enter the address: ").strip()
-                        if len(address) > 120:
-                            print("Address exceeds the maximum allowed length of 120 symbols. Please try again.")
-                        else:
-                            record = book[name_key]
-                            record.add_address(address)
-                            print(f"Address {address} added to contact {name} successfully!")
-                            break
-                else:
-                    print(f"Contact {name} not found.")
+            name = input("Enter the name of the contact you want to add the address to: ")
+            name_key = name.lower()
+            if name_key in book:
+                while True:
+                    address = input("Enter the address: ").strip()
+                    if len(address) > 120:
+                        print("Address exceeds the maximum allowed length of 120 symbols. Please try again.")
+                    else:
+                        record = book[name_key]
+                        record.add_address(address)
+                        print(f"Address {address} added to contact {name} successfully!")
+                        break
+            else:
+                print(f"Contact {name} not found.")
 
         elif command == "show-address":
             name = input("Enter the name of the contact whose address you want to see: ")
