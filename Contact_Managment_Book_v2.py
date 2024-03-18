@@ -236,7 +236,7 @@ class Record:
             index = int(index)
             if 0 <= index < len(self.notions):
                 del self.notions[index]
-                print("Нотатку успішно видалено.")
+                return "Нотатку успішно видалено."
             else:
                 print("Неправильний індекс нотатки.")
         except ValueError as e:
@@ -383,7 +383,7 @@ class AddressBook(UserDict):
             print(f"Contact {name} not found.")
 #_______________________________________________________________________________________________________________________________
     def save_to_json(self, filename="contacts_book.json"):
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             json_data = []
             for record in self.data.values():
                 record_data = {
@@ -400,7 +400,7 @@ class AddressBook(UserDict):
 
     def load_from_json(self, filename="contacts_book.json"):
         try:
-            with open(filename, 'r') as f:
+            with open(filename, 'r', encoding= 'utf-8') as f:
                 data = json.load(f)
                 self.data.clear()
                 for record_data in data:
@@ -414,8 +414,7 @@ class AddressBook(UserDict):
                     if birthday:
                         record.add_birthday(birthday)
                     for notion_data in record_data.get("notions", []):
-                        hashtags = ' '.join(notion_data["hashtags"])
-                        record.add_notion(notion_data["text"], hashtags)
+                        record.add_notion(notion_data["text"], notion_data["hashtags"])
                     addresses = record_data.get("addresses", [])
                     if addresses:
                         for address in addresses:
