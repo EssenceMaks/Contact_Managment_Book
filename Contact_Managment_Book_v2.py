@@ -122,6 +122,22 @@ class Find:
             if record.birthday and str(record.birthday) == birthday:
                 found_contacts.append(record)
         return found_contacts
+    
+    @staticmethod
+    def find_by_address(address_book, address):
+        found_contacts = []
+        for record in address_book.values():
+            if record.address and address in record.address.addresses:
+                found_contacts.append(record)
+        return found_contacts
+
+    @staticmethod
+    def find_by_email(address_book, email):
+        found_contacts = []
+        for record in address_book.values():
+            if record.email and record.email.value.lower() == email.lower():
+                found_contacts.append(record)
+        return found_contacts
 
 
 class Record:
@@ -483,6 +499,8 @@ def command_line_helper(args=None):
             "find-name [ім'я]                                               -- для пошуку за ім'ям\n"
             "find-phone [телефон]                                           -- для пошуку за телефоном\n"
             "find-birth [дата]                                              -- для пошуку за днем народження\n"
+            "find-address [адреса]                                          -- для пошуку за адресою\n"
+            "find-email [email]                                             -- для пошуку за електронною поштою\n"
             "add-notion [ім'я] [текст] [хештеги]                            -- для додавання нотатки\n"
             "edit-notion [ім'я] [індекс] [новий текст] [нові хештеги]       -- для редагування нотатки\n"
             "delete-notion [ім'я] [індекс]                                  -- для видалення нотатки\n"
@@ -495,7 +513,7 @@ def command_line_helper(args=None):
             "save [файл.json]                                               -- для збереження контактів у файл JSON\n"
             "load [файл.json]                                               -- для завантаження контактів з файлу JSON\n"
             "q /good bye/close/exit/quit                                    -- для виходу з програми\n"
-            "\nВведіть команду:"
+            # "\nВведіть команду:"
             "\n")
             
 
@@ -753,6 +771,26 @@ def main():
             found_contacts = Find.find_by_phone(book, phone_to_find)
             if found_contacts:
                 print("Знайдені контакти:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("Контакти не знайдено.")
+
+        elif command == 'find-address':
+            address_to_find = input("Введіть адресу для пошуку: ")
+            found_contacts = Find.find_by_address(book, address_to_find)
+            if found_contacts:
+                print("Знайдені контакти:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("Контакти не знайдено.")
+
+        elif command == 'find-email':
+            email_to_find = input("Введіть пошту для пошуку: ")
+            found_contacts = Find.find_by_email(book, email_to_find)
+            if found_contacts:
+                print("Found contacts:")
                 for contact in found_contacts:
                     print(contact)
             else:
