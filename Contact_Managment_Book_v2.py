@@ -2,7 +2,8 @@ import json
 import datetime
 import re
 from collections import UserDict
-import difflib
+from colorama import init, Fore, Style
+init()
 
 class Address:
     def __init__(self, address):
@@ -84,15 +85,27 @@ class Notion:
             raise ValueError("Текст нотатки не може бути порожнім або перевищувати 280 символів.")
         return text
 
-    def _validate_hashtags(self, hashtags):
+    @staticmethod
+    def _validate_hashtags(hashtags):
         validated_hashtags = []
         pattern = re.compile(r"^#\w+$")
-        for hashtag in hashtags.split():
+        for hashtag in hashtags:
             if pattern.match(hashtag):
                 validated_hashtags.append(hashtag)
             else:
                 raise ValueError("Неправильний формат хештегу.")
         return validated_hashtags
+    
+def get_valid_hashtags():
+    while True:
+        hashtags_input = input("Додайте хештеги: ")
+        hashtags = hashtags_input.split()
+        try:
+            validated_hashtags = Notion._validate_hashtags(hashtags)
+            return validated_hashtags
+        except ValueError as e:
+            print(e)
+            print("Будь ласка, спробуйте ввести хештеги ще раз.")
 
 class Find:
     @staticmethod
@@ -118,6 +131,22 @@ class Find:
         found_contacts = []
         for record in address_book.values():
             if record.birthday and str(record.birthday) == birthday:
+                found_contacts.append(record)
+        return found_contacts
+    
+    @staticmethod
+    def find_by_address(address_book, address):
+        found_contacts = []
+        for record in address_book.values():
+            if record.address and address in record.address.addresses:
+                found_contacts.append(record)
+        return found_contacts
+
+    @staticmethod
+    def find_by_email(address_book, email):
+        found_contacts = []
+        for record in address_book.values():
+            if record.email and record.email.value.lower() == email.lower():
                 found_contacts.append(record)
         return found_contacts
 
@@ -205,6 +234,7 @@ class Record:
             return "не додано"
     
     def add_notion(self, text, hashtags):
+        hashtag_list = hashtags
         self.notions.append(Notion(text, hashtags))
 
     def edit_notion(self, index, new_text, new_hashtags):
@@ -212,9 +242,9 @@ class Record:
             index = int(index)
             if 0 <= index < len(self.notions):
                 self.notions[index] = Notion(new_text, new_hashtags)
-                print("Нотатку успішно змінено.")
+                return "Нотатку успішно змінено."
             else:
-                print("Неправильний індекс нотатки.")
+                return "Неправильний індекс нотатки."
         except ValueError as e:
             print(e)
 
@@ -223,7 +253,7 @@ class Record:
             index = int(index)
             if 0 <= index < len(self.notions):
                 del self.notions[index]
-                print("Нотатку успішно видалено.")
+                return "Нотатку успішно видалено."
             else:
                 print("Неправильний індекс нотатки.")
         except ValueError as e:
@@ -328,32 +358,75 @@ class AddressBook(UserDict):
 
     def birthdays(self):
         today = datetime.datetime.now()
-        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []}
+        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': [], 'Today': []}
+        from_day_column_width = 18
 
         for record in self.data.values():
             if record.birthday:
                 birthday_date = record.birthday.value
                 next_birthday = birthday_date.replace(year=today.year)
-                if next_birthday < today:
-                    next_birthday = birthday_date.replace(year=today.year + 1)
                 delta_days = (next_birthday - today).days
                 birthday_weekday = next_birthday.strftime('%A')
-                if 0 <= delta_days < 7:
+
+                if next_birthday < today and (birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday') and birthday_weekday != 'Friday' and birthday_weekday != 'Thursday':
+                    from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)  # Заполняем колонку from
+                    birthdays_this_week['Monday'].append((record, from_day)) # Добавляем в список для понедельника
+
+                # Обработка дней рождений для предыдущего кода
+                if delta_days == 7:
+                    if 'Next Monday' not in birthdays_this_week:
+                        birthdays_this_week['Next Monday'] = []
+                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+                elif 0 <= delta_days < 7:
                     if birthday_weekday in ['Saturday', 'Sunday']:
                         if 'Next Monday' not in birthdays_this_week:
                             birthdays_this_week['Next Monday'] = []
                         birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
                     else:
                         birthdays_this_week[birthday_weekday].append(record.name.value)
-                elif delta_days == 7:
-                    if 'Next Monday' not in birthdays_this_week:
-                        birthdays_this_week['Next Monday'] = []
-                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+
+                # Обработка дней рождений для второго кода
+                if next_birthday.strftime('%d.%m') == today.strftime('%d.%m'):
+                    birthdays_this_week[birthday_weekday].append((record, ''))
+                else:
+                    if delta_days == 0 and birthday_date.strftime('%d.%m') == today.strftime('%d.%m'):
+                        birthdays_this_week['Today'].append((record, ''))
+                    elif 0 <= delta_days < 6:
+                        from_day = ''
+                        if birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday':
+                            birthday_weekday = 'Monday'
+                            from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)
+                        elif record not in birthdays_this_week[birthday_weekday]:
+                            birthdays_this_week[birthday_weekday].append((record, from_day))
+
+        print("Upcoming birthdays:")
         upcoming_birthdays = []
-        for day, names in birthdays_this_week.items():
-            if names:
-                print(f"{day}: {', '.join(names)}")
-                upcoming_birthdays.extend(names)
+
+        for day, contacts in birthdays_this_week.items():
+            if day != 'Today' and contacts:
+                print(f"\n{day}:")
+                for contact_data in contacts:
+                    if len(contact_data) == 2:
+                        contact, from_day = contact_data
+                        name_padding = 30 - len(contact.name.value)
+                        birthday_padding = 12 - len(contact.show_birthday())
+                        from_day_text = from_day if from_day else "".ljust(from_day_column_width)
+                        email_padding = 30 - len(contact.show_email())
+                        print(
+                            Fore.CYAN + f"{contact.name.value}{' ' * name_padding}" +
+                            Fore.YELLOW + f"{from_day_text}" +
+                            Fore.MAGENTA + " | " +
+                            Fore.CYAN + f"{contact.show_birthday()}{' ' * birthday_padding}" +
+                            Fore.MAGENTA + " | " +
+                            Fore.CYAN + f"{', '.join(str(phone) for phone in contact.phones)}" +
+                            Fore.MAGENTA + " | " +
+                            Fore.CYAN + f"{contact.show_email()}{' ' * email_padding}" +
+                            Fore.MAGENTA + " | " +
+                            Style.RESET_ALL
+                        )
+                    else:
+                        # Пропускаем обработку элемента, который не соответствует ожидаемому формату
+                        continue
 
         return upcoming_birthdays
     
@@ -370,7 +443,7 @@ class AddressBook(UserDict):
             print(f"Contact {name} not found.")
 #_______________________________________________________________________________________________________________________________
     def save_to_json(self, filename="contacts_book.json"):
-        with open(filename, 'w') as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             json_data = []
             for record in self.data.values():
                 record_data = {
@@ -387,7 +460,7 @@ class AddressBook(UserDict):
 
     def load_from_json(self, filename="contacts_book.json"):
         try:
-            with open(filename, 'r') as f:
+            with open(filename, 'r', encoding= 'utf-8') as f:
                 data = json.load(f)
                 self.data.clear()
                 for record_data in data:
@@ -401,8 +474,7 @@ class AddressBook(UserDict):
                     if birthday:
                         record.add_birthday(birthday)
                     for notion_data in record_data.get("notions", []):
-                        hashtags = ' '.join(notion_data["hashtags"])
-                        record.add_notion(notion_data["text"], hashtags)
+                        record.add_notion(notion_data["text"], notion_data["hashtags"])
                     addresses = record_data.get("addresses", [])
                     if addresses:
                         for address in addresses:
@@ -419,36 +491,39 @@ def command_line_helper(args=None):
         return print("Щоб побачити меню команд введіть h або help")
 
     help = ("\nДоступні команди:\n"
-            "Цифра 1: hello                                                          -- для вітання з ботом\n"
-            "Цифра 2: h                                                              -- для допомоги\n"
-            "Цифра 2: help                                                           -- для допомоги\n"
-            "Цифра 3: add [ім'я] [телефон]                                           -- для додавання контакту\n"
-            "Цифра 4: change [ім'я] [індекс] [телефон]                               -- для зміни номера контакту\n"
-            "Цифра 5: phone [ім'я]                                                   -- для отримання номера телефону\n"
-            "Цифра 6: delete [ім'я]                                                  -- для видалення контакту\n"
-            "Цифра 7: all                                                            -- для відображення всіх контактів\n"
-            "Цифра 8: add-email [ім'я] [email]                                       -- для додавання електронної пошти\n"
-            "Цифра 9: show-email [ім'я]                                              -- для відображення електронної пошти\n"
-            "Цифра 10: change-email [ім'я] [email]                                    -- для заміни електронної пошти\n"
-            "Цифра 11: delete-email [ім'я] [email]                                    -- для видалення електронної пошти\n"
-            "Цифра 12: add-birthday [ім'я] [дата]                                     -- для додавання дня народження\n"
-            "Цифра 13: show-birthday [ім'я]                                           -- для відображення дня народження\n"
-            "Цифра 14: birthdays                                                      -- для відображення майбутніх днів народження\n"
-            "Цифра 15: find-name [ім'я]                                               -- для пошуку за ім'ям\n"
-            "Цифра 16: find-phone [телефон]                                           -- для пошуку за телефоном\n"
-            "Цифра 17: find-birth [дата]                                              -- для пошуку за днем народження\n"
-            "Цифра 18: add-notion [ім'я] [текст] [хештеги]                            -- для додавання нотатки\n"
-            "Цифра 19: edit-notion [ім'я] [індекс] [новий текст] [нові хештеги]       -- для редагування нотатки\n"
-            "Цифра 20: delete-notion [ім'я] [індекс]                                  -- для видалення нотатки\n"
-            "Цифра 21: add-hashtag [ім'я] [індекс нотатки] [хештег]                   -- для додавання хештегу до нотатки\n"
-            "Цифра 22: remove-hashtag [ім'я] [індекс нотатки] [хештег]                -- для видалення хештегу з нотатки\n"
-            "Цифра 23: add-address [ім'я]                                             -- для додавання адреси\n"
-            "Цифра 24: show-address [ім'я]                                            -- для відображення адреси\n"
-            "Цифра 25: edit-address [ім'я]                                            -- для редагування адреси\n"
-            "Цифра 26: delete-address [ім'я]                                          -- для видалення адреси\n"
-            "Цифра 27: save [файл.json]                                               -- для збереження контактів у файл JSON\n"
-            "Цифра 28: load [файл.json]                                               -- для завантаження контактів з файлу JSON\n"
-            "\nВведіть команду або цифру від 1 до 28 :"
+
+            " 1: hello                                                           -- для вітання з ботом\n"
+            " 2: h                                                               -- для допомоги\n"
+            " 2: help                                                            -- для допомоги\n"
+            " 3: add [ім'я] [телефон]                                            -- для додавання контакту\n"
+            " 4: change [ім'я] [індекс] [телефон]                                -- для зміни номера контакту\n"
+            " 5: phone [ім'я]                                                    -- для отримання номера телефону\n"
+            " 6: delete [ім'я]                                                   -- для видалення контакту\n"
+            " 7: all                                                             -- для відображення всіх контактів\n"
+            " 8: add-email [ім'я] [email]                                        -- для додавання електронної пошти\n"
+            " 9: show-email [ім'я]                                               -- для відображення електронної пошти\n"
+            " 10: change-email [ім'я] [email]                                    -- для заміни електронної пошти\n"
+            " 11: delete-email [ім'я] [email]                                    -- для видалення електронної пошти\n"
+            " 12: add-birthday [ім'я] [дата]                                     -- для додавання дня народження\n"
+            " 13: show-birthday [ім'я]                                           -- для відображення дня народження\n"
+            " 14: birthdays                                                      -- для відображення майбутніх днів народження\n"
+            " 15: find-name [ім'я]                                               -- для пошуку за ім'ям\n"
+            " 16: find-phone [телефон]                                           -- для пошуку за телефоном\n"
+            " 17: find-birth [дата]                                              -- для пошуку за днем народження\n"
+            " 18: add-notion [ім'я] [текст] [хештеги]                            -- для додавання нотатки\n"
+            " 19: edit-notion [ім'я] [індекс] [новий текст] [нові хештеги]       -- для редагування нотатки\n"
+            " 20: delete-notion [ім'я] [індекс]                                  -- для видалення нотатки\n"
+            " 21: add-hashtag [ім'я] [індекс нотатки] [хештег]                   -- для додавання хештегу до нотатки\n"
+            " 22: remove-hashtag [ім'я] [індекс нотатки] [хештег]                -- для видалення хештегу з нотатки\n"
+            " 23: add-address [ім'я]                                             -- для додавання адреси\n"
+            " 24: show-address [ім'я]                                            -- для відображення адреси\n"
+            " 25: edit-address [ім'я]                                            -- для редагування адреси\n"
+            " 26: delete-address [ім'я]                                          -- для видалення адреси\n"
+            " 27: save [файл.json]                                               -- для збереження контактів у файл JSON\n"
+            " 28: load [файл.json]                                               -- для завантаження контактів з файлу JSON\n"
+            "q /good bye/close/exit/quit                                         -- для виходу з програми\n"
+            "\n Виберіть цифру 1 до 28 або"  
+            "\n Введіть команду повність:"
             "\n")
     return help
 # _______________________________________________________________________________________________________________________________
@@ -974,18 +1049,17 @@ def main():
                 print(f"Контакт '{name}' додано успішно!")
 
                 
-        elif command.startswith("add-notion "):
-            parts = command.split(" ", 3)
-            if len(parts) >= 4:
-                name, text, hashtags = parts[1], parts[2], parts[3]
-                contact = book.find(name.lower())
-                if contact:
-                    contact.add_notion(text, hashtags)
-                    print(f"Нотатка додана до контакту {name}.")
-                else:
-                    print("Контакт не знайдено.")
+        elif command == 'add-notion':
+            name = input("Введіть ім'я контакту до якого ви б хотіли додати нотатку: ")
+            name_key = name.lower()
+            if name_key in book:
+                text = input("Введіть текст: ")
+                hashtags = get_valid_hashtags() 
+                record = book[name_key]
+                record.add_notion(text, hashtags)
+                print("Нотатку успішно додано!")
             else:
-                print("Недостатньо аргументів. Використовуйте формат: add-notion [ім'я] [текст] [хештеги]")
+                print(f"Контакт {name} не знайдено.")
 
         elif command.startswith("find-notions "):
             hashtag = command.split(" ", 1)[1]
@@ -1024,57 +1098,104 @@ def main():
             else:
                 print("Контакт не знайдено!")
 
-        elif command.startswith("edit-notion "):
-            parts = command.split(" ", 4)
-            if len(parts) >= 5:
-                name, index, new_text, new_hashtags = parts[1], parts[2], parts[3], parts[4]
-                contact = book.find(name.lower())
-                if contact:
-                    contact.edit_notion(int(index), new_text, new_hashtags)
-                    print("Нотатку успішно змінено.")
+        elif command.startswith("edit-notion"):
+            name = input("Введіть ім'я контакту, в якого ви хочете змінити нотатку: ")
+            name_key = name.lower()
+            if name_key in book:
+                record = book[name_key]
+                if record.notions:
+                    for i, notion in enumerate(record.notions):
+                        print(f"{i}: {notion.text} - {' '.join(notion.hashtags)}")
+                    index = input("Введіть номер нотатки, яку хочете змінити: ")
+                    try:
+                        index = int(index)
+                        if 0 <= index < len(record.notions):
+                            new_text = input("Введіть новий текст нотатки: ")
+                            new_hashtags = input("Додайте нові хештеги: ")
+                            record.edit_notion(index, new_text, new_hashtags.split())
+                            print("Нотатку успішно змінено!")
+                        else:
+                            print("Неправильний номер нотатки.")
+                    except ValueError:
+                        print("Номер нотатки має бути числом.")
                 else:
-                    print("Контакт не знайдено.")
+                    print("У цього контакту немає нотаток.")
             else:
-                print("Недостатньо аргументів. Використовуйте формат: edit-notion [ім'я] [індекс] [новий текст] [нові хештеги]")
+                print(f"Контакт {name} не знайдено.")
 
-        elif command.startswith("delete-notion "):
-            parts = command.split(" ", 3)
-            if len(parts) == 3:
-                name, index = parts[1], parts[2]
-                contact = book.find(name.lower())
-                if contact:
-                    contact.delete_notion(int(index))
-                    print("Нотатку успішно видалено.")
+        elif command.startswith("delete-notion"):
+            name = input("Введіть ім'я контакту, в якого ви хочете видалити нотатку: ")
+            name_key = name.lower()
+            if name_key in book:
+                record = book[name_key]
+                if record.notions:
+                    for i, notion in enumerate(record.notions):
+                        print(f"{i}: {notion.text} - {' '.join(notion.hashtags)}")
+                    index = input("Введіть номер нотатки для видалення: ")
+                    try:
+                        index = int(index)
+                        if 0 <= index < len(record.notions):
+                            record.delete_notion(index)
+                            print("Нотатку успішно видалено!")
+                        else:
+                            print("Неправильний номер нотатки.")
+                    except ValueError:
+                        print("Номер нотатки має бути числом.")
                 else:
-                    print("Контакт не знайдено.")
+                    print("У цього контакту немає нотаток.")
             else:
-                print("Недостатньо аргументів. Використовуйте формат: delete-notion [ім'я] [індекс]")
+                print(f"Контакт {name} не знайдено.")
 
-        elif command.startswith("add-hashtag "):
-            parts = command.split(" ", 3)
-            if len(parts) == 4:
-                name, notion_index, hashtag = parts[1], parts[2], parts[3]
-                contact = book.find(name.lower())
-                if contact:
-                    contact.add_hashtag_to_notion(int(notion_index), hashtag)
-                    print(f"Хештег #{hashtag} додано до нотатки.")
+        elif command == 'add-hashtag':
+            name = input("Введіть ім'я контакту до якого ви хотіли б додати хештег: ")
+            name_key = name.lower()
+            if name_key in book:
+                record = book[name_key]
+                if record.notions:
+                    for i, notion in enumerate(record.notions):
+                        print(f"{i}: {notion.text} - {' '.join(notion.hashtags)}")
+                    index = input("Введіть номер нотатки, до якої хочете додати хештег: ")
+                    try:
+                        index = int(index)
+                        if 0 <= index < len(record.notions):
+                            new_hashtag = get_valid_hashtags()
+                            record.notions[index].hashtags.extend(new_hashtag)
+                            print("Хештег успішно додано!")
+                        else:
+                            print("Неправильний номер нотатки.")
+                    except ValueError:
+                        print("Номер нотатки має бути числом.")
                 else:
-                    print("Контакт не знайдено.")
+                    print("У цього контакту немає нотаток.")
             else:
-                print("Недостатньо аргументів. Використовуйте формат: add-hashtag [ім'я] [індекс нотатки] [хештег]")
+                print(f"Контакт {name} не знайдено.")
 
-        elif command.startswith("remove-hashtag "):
-            parts = command.split(" ", 3)
-            if len(parts) == 4:
-                name, notion_index, hashtag = parts[1], parts[2], parts[3]
-                contact = book.find(name.lower())
-                if contact:
-                    contact.remove_hashtag_from_notion(int(notion_index), hashtag)
-                    print(f"Хештег #{hashtag} видалено з нотатки.")
+        elif command == 'remove-hashtag':
+            name = input("Введіть ім'я контакту від якого ви хотіли б видалити хештег: ")
+            name_key = name.lower()
+            if name_key in book:
+                record = book[name_key]
+                if record.notions:
+                    for i, notion in enumerate(record.notions):
+                        print(f"{i}: {notion.text} - {' '.join(notion.hashtags)}")
+                    index = input("Введіть номер нотатки, від якої хочете видалити хештег: ")
+                    try:
+                        index = int(index)
+                        if 0 <= index < len(record.notions):
+                            hashtag_to_remove = input("Введіть хештег для видалення: ")
+                            if hashtag_to_remove in record.notions[index].hashtags:
+                                record.notions[index].hashtags.remove(hashtag_to_remove)
+                                print("Хештег успішно видалено!")
+                            else:
+                                print("Такий хештег не знайдено у вибраній нотатці.")
+                        else:
+                            print("Неправильний номер нотатки.")
+                    except ValueError:
+                        print("Номер нотатки має бути числом.")
                 else:
-                    print("Контакт не знайдено.")
+                    print("У цього контакту немає нотаток.")
             else:
-                print("Недостатньо аргументів. Використовуйте формат: remove-hashtag [ім'я] [індекс нотатки] [хештег]")
+                print(f"Контакт {name} не знайдено.")
 
         elif command == 'phone':
             name = input("Введіть ім'я контакту: ").strip().lower()
@@ -1100,11 +1221,11 @@ def main():
         elif command == 'all-names':
             existing_names = book.all_names()
             if existing_names:
-                print("Existing contact names:")
+                print("Існуюючі імена контактів: ")
                 for name in existing_names:
                     print(name)
             else:
-                print("No contacts found.")
+                print("Контакти не знайдено.")
         
         elif command == 'add-email':
             name = input("Введіть ім'я контакту: ").strip().lower()
@@ -1122,7 +1243,7 @@ def main():
         elif command == 'show-email':
             name = input("Введіть ім'я контакту: ").strip().lower()
             if name in book.data:
-                print(f"Email for {book.data[name].name.value}: {book.data[name].show_email()}")
+                print(f"Адреса електронної пошти {book.data[name].name.value}: {book.data[name].show_email()}")
             else:
                 print("Контакт не знайдено!")
 
@@ -1186,7 +1307,7 @@ def main():
             name_to_find = input("Введіть ім'я для пошуку: ")
             found_contacts = Find.find_by_name(book, name_to_find)
             if found_contacts:
-                print("Знайдені контакти:")
+                print("Знайдені контакти: ")
                 for contact in found_contacts:
                     print(contact)
             else:
@@ -1196,7 +1317,27 @@ def main():
             phone_to_find = input("Введіть номер телефону для пошуку: ")
             found_contacts = Find.find_by_phone(book, phone_to_find)
             if found_contacts:
+                print("Знайдені контакти: ")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("Контакти не знайдено.")
+
+        elif command == 'find-address':
+            address_to_find = input("Введіть адресу для пошуку: ")
+            found_contacts = Find.find_by_address(book, address_to_find)
+            if found_contacts:
                 print("Знайдені контакти:")
+                for contact in found_contacts:
+                    print(contact)
+            else:
+                print("Контакти не знайдено.")
+
+        elif command == 'find-email':
+            email_to_find = input("Введіть пошту для пошуку: ")
+            found_contacts = Find.find_by_email(book, email_to_find)
+            if found_contacts:
+                print("Found contacts:")
                 for contact in found_contacts:
                     print(contact)
             else:
@@ -1206,17 +1347,17 @@ def main():
             birthday_to_find = input("Введіть день народження для пошуку (ДД.ММ.РРРР): ")
             found_contacts = Find.find_by_birthday(book, birthday_to_find)
             if found_contacts:
-                print("Знайдені контакти:")
+                print("Знайдені контакти: ")
                 for contact in found_contacts:
                     print(contact)
             else:
                 print("Контакти не знайдено.")
 
         elif command == 'find-name':
-            name_to_find = input("Enter name to find: ")
+            name_to_find = input("Введіть ім'я, яке хочете знайти: ")
             found_contacts = Find.find_by_name(book, name_to_find)
             if found_contacts:
-                print("Found contacts:")
+                print("Знайдені контакти: ")
                 for contact in found_contacts:
                     print(contact)
             else:
@@ -1248,12 +1389,17 @@ def main():
             name = input("Enter the name of the contact you want to add the address to: ")
             name_key = name.lower()
             if name_key in book:
-                address = input("Enter the address: ").strip()
-                record = book[name_key]
-                record.add_address(address)
-                print(f"Address {address} added to contact {name} successfully!")
+                while True:
+                    address = input("Enter the address: ").strip()
+                    if len(address) > 120:
+                        print("Address exceeds the maximum allowed length of 120 symbols. Please try again.")
+                    else:
+                        record = book[name_key]
+                        record.add_address(address)
+                        print(f"Address {address} added to contact {name} successfully!")
+                        break
             else:
-                print(f"Контакт {name} не знайдено.")
+                print(f"Contact {name} not found.")
 
         elif command == "show-address":
             name = input("Enter the name of the contact whose address you want to see: ")
