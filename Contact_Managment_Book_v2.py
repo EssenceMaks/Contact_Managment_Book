@@ -3,6 +3,8 @@ import datetime
 import re
 from collections import UserDict
 import difflib
+from colorama import init, Fore, Style
+init()
 
 class Address:
     def __init__(self, address):
@@ -328,32 +330,75 @@ class AddressBook(UserDict):
 
     def birthdays(self):
         today = datetime.datetime.now()
-        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': []}
+        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': [], 'Today': []}
+        from_day_column_width = 18
 
         for record in self.data.values():
             if record.birthday:
                 birthday_date = record.birthday.value
                 next_birthday = birthday_date.replace(year=today.year)
-                if next_birthday < today:
-                    next_birthday = birthday_date.replace(year=today.year + 1)
                 delta_days = (next_birthday - today).days
                 birthday_weekday = next_birthday.strftime('%A')
-                if 0 <= delta_days < 7:
+
+                if next_birthday < today and (birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday') and birthday_weekday != 'Friday' and birthday_weekday != 'Thursday':
+                    from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)  # Заполняем колонку from
+                    birthdays_this_week['Monday'].append((record, from_day)) # Добавляем в список для понедельника
+
+                # Обработка дней рождений для предыдущего кода
+                if delta_days == 7:
+                    if 'Next Monday' not in birthdays_this_week:
+                        birthdays_this_week['Next Monday'] = []
+                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+                elif 0 <= delta_days < 7:
                     if birthday_weekday in ['Saturday', 'Sunday']:
                         if 'Next Monday' not in birthdays_this_week:
                             birthdays_this_week['Next Monday'] = []
                         birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
                     else:
                         birthdays_this_week[birthday_weekday].append(record.name.value)
-                elif delta_days == 7:
-                    if 'Next Monday' not in birthdays_this_week:
-                        birthdays_this_week['Next Monday'] = []
-                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+
+                # Обработка дней рождений для второго кода
+                if next_birthday.strftime('%d.%m') == today.strftime('%d.%m'):
+                    birthdays_this_week[birthday_weekday].append((record, ''))
+                else:
+                    if delta_days == 0 and birthday_date.strftime('%d.%m') == today.strftime('%d.%m'):
+                        birthdays_this_week['Today'].append((record, ''))
+                    elif 0 <= delta_days < 6:
+                        from_day = ''
+                        if birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday':
+                            birthday_weekday = 'Monday'
+                            from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)
+                        elif record not in birthdays_this_week[birthday_weekday]:
+                            birthdays_this_week[birthday_weekday].append((record, from_day))
+
+        print("Upcoming birthdays:")
         upcoming_birthdays = []
-        for day, names in birthdays_this_week.items():
-            if names:
-                print(f"{day}: {', '.join(names)}")
-                upcoming_birthdays.extend(names)
+
+        for day, contacts in birthdays_this_week.items():
+            if day != 'Today' and contacts:
+                print(f"\n{day}:")
+                for contact_data in contacts:
+                    if len(contact_data) == 2:
+                        contact, from_day = contact_data
+                        name_padding = 30 - len(contact.name.value)
+                        birthday_padding = 12 - len(contact.show_birthday())
+                        from_day_text = from_day if from_day else "".ljust(from_day_column_width)
+                        email_padding = 30 - len(contact.show_email())
+                        print(
+                            Fore.CYAN + f"{contact.name.value}{' ' * name_padding}" +
+                            Fore.YELLOW + f"{from_day_text}" +
+                            Fore.MAGENTA + " | " +
+                            Fore.CYAN + f"{contact.show_birthday()}{' ' * birthday_padding}" +
+                            Fore.MAGENTA + " | " +
+                            Fore.CYAN + f"{', '.join(str(phone) for phone in contact.phones)}" +
+                            Fore.MAGENTA + " | " +
+                            Fore.CYAN + f"{contact.show_email()}{' ' * email_padding}" +
+                            Fore.MAGENTA + " | " +
+                            Style.RESET_ALL
+                        )
+                    else:
+                        # Пропускаем обработку элемента, который не соответствует ожидаемому формату
+                        continue
 
         return upcoming_birthdays
     
