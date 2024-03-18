@@ -6,8 +6,17 @@
         ],
         "email": null,
         "birthday": "11.03.1988",
-        "notions": [],
-        "addresses": []
+        "notions": [
+            {
+                "text": "This is a test",
+                "hashtags": [
+                    "#1"
+                ]
+            }
+        ],
+        "addresses": [
+            "Vienna"
+        ]
     },
     {
         "name": "Sharon Stone",
@@ -102,5 +111,15 @@
         "addresses": [
             "Spaine"
         ]
+    },
+    {
+        "name": "YARA",
+        "phones": [
+            "1231231231"
+        ],
+        "email": null,
+        "birthday": null,
+        "notions": [],
+        "addresses": []
     }
 ]
