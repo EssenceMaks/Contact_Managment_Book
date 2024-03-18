@@ -5,7 +5,7 @@ from collections import UserDict
 from colorama import init, Fore, Style
 init()
 
-# обгортка
+# Обгортка
 import tkinter as tk
 from tkinter import scrolledtext, filedialog, Tk, Entry, StringVar, Label, Frame
 
@@ -28,11 +28,11 @@ class Address:
         if self.addresses:
             return f"\nАдреса для контакту {name}: {self.addresses[0]}"
         else:
-            return "Адреса не була вказана"
+            return "Адреса не була вказана."
             
     def edit_address(self, new_address):
         self.addresses = [new_address]
-        return "Адресу успішно відредаговано"
+        return "Адресу успішно відредаговано."
 
     def delete_address(self, address):
         self.addresses = [a for a in self.addresses if str(a) != str(address)]
@@ -371,7 +371,7 @@ class AddressBook(UserDict):
 
     def birthdays(self):
         today = datetime.datetime.now()
-        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': [], 'Today': []}
+        birthdays_this_week = {'Понеділок': [], 'Вівторок': [], 'Середа': [], 'Четвер': [], 'П"ятниця': [], 'Субота': [], 'Неділя': [], 'Сьогодні': []}
         from_day_column_width = 18
 
         for record in self.data.values():
@@ -381,42 +381,42 @@ class AddressBook(UserDict):
                 delta_days = (next_birthday - today).days
                 birthday_weekday = next_birthday.strftime('%A')
 
-                if next_birthday < today and (birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday') and birthday_weekday != 'Friday' and birthday_weekday != 'Thursday':
-                    from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)  # Заполняем колонку from
-                    birthdays_this_week['Monday'].append((record, from_day)) # Добавляем в список для понедельника
+                if next_birthday < today and (birthday_weekday == 'Субота' or birthday_weekday == 'Неділя') and birthday_weekday != 'П"ятниця' and birthday_weekday != 'Четвер':
+                    from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)  # Заповнюємо стовпець from
+                    birthdays_this_week['Понеділок'].append((record, from_day)) # Додаємо до списку для понеділка
 
-                # Обработка дней рождений для предыдущего кода
+                # Обробка днів народження для попереднього коду
                 if delta_days == 7:
-                    if 'Next Monday' not in birthdays_this_week:
-                        birthdays_this_week['Next Monday'] = []
-                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+                    if 'Наступний понеділок' not in birthdays_this_week:
+                        birthdays_this_week['Наступний понеділок'] = []
+                    birthdays_this_week['Наступний понеділок'].append(f"{record.name.value} (will be on {birthday_weekday})")
                 elif 0 <= delta_days < 7:
-                    if birthday_weekday in ['Saturday', 'Sunday']:
-                        if 'Next Monday' not in birthdays_this_week:
-                            birthdays_this_week['Next Monday'] = []
-                        birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
+                    if birthday_weekday in ['Субота', 'Неділя']:
+                        if 'Наступний понеділок' not in birthdays_this_week:
+                            birthdays_this_week['Наступний понеділок'] = []
+                        birthdays_this_week['Наступний понеділок'].append(f"{record.name.value} (from {birthday_weekday})")
                     else:
                         birthdays_this_week[birthday_weekday].append(record.name.value)
 
-                # Обработка дней рождений для второго кода
+                # Обробка днів народження для другого коду
                 if next_birthday.strftime('%d.%m') == today.strftime('%d.%m'):
                     birthdays_this_week[birthday_weekday].append((record, ''))
                 else:
                     if delta_days == 0 and birthday_date.strftime('%d.%m') == today.strftime('%d.%m'):
-                        birthdays_this_week['Today'].append((record, ''))
+                        birthdays_this_week['Сьогодні'].append((record, ''))
                     elif 0 <= delta_days < 6:
                         from_day = ''
-                        if birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday':
-                            birthday_weekday = 'Monday'
+                        if birthday_weekday == 'Субота' or birthday_weekday == 'Неділя':
+                            birthday_weekday = 'Понеділок'
                             from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)
                         elif record not in birthdays_this_week[birthday_weekday]:
                             birthdays_this_week[birthday_weekday].append((record, from_day))
 
-        print("Upcoming birthdays:")
+        print("Майбутні дні народження:")
         upcoming_birthdays = []
 
         for day, contacts in birthdays_this_week.items():
-            if day != 'Today' and contacts:
+            if day != 'Сьогодні' and contacts:
                 print(f"\n{day}:")
                 for contact_data in contacts:
                     if len(contact_data) == 2:
@@ -438,7 +438,7 @@ class AddressBook(UserDict):
                             Style.RESET_ALL
                         )
                     else:
-                        # Пропускаем обработку элемента, который не соответствует ожидаемому формату
+                        # Пропускаємо обробку елемента, який не відповідає очікуваному формату
                         continue
 
         return upcoming_birthdays
@@ -546,7 +546,7 @@ def command_line_helper(args=None):
 class GUI:
     def __init__(self, master, address_book):
         self.master = master
-        self.book = address_book  # сохраняем объект book в атрибуте экземпляра класса
+        self.book = address_book  # Зберігаємо об’єкт book в атрибуті копії класу
         master.title("BotLY")
 
 
@@ -555,24 +555,24 @@ class GUI:
         # self.console_output = scrolledtext.ScrolledText(master, width=180, height=20)
         # self.console_output.pack()
         master.title("Console Interface")
-         # Подготовка отступов для элементов интерфейса
+         # Підготовка відступу до елементів інтерфейсу
         padx_val = 5
         pady_val = 5
 
-        # # Создание фрейма для размещения полей ввода
+        # Створення фрейму для розміщення вхідних полів
         # input_frame = tk.Frame(master)
         # input_frame.pack(side='left', padx=padx_val, pady=pady_val)
 
 
         self.command_entry = tk.Entry(master, width=130)
         self.command_entry.grid(row=1, column=1, padx=padx_val, pady=pady_val, sticky='w')
-        self.command_entry.bind('<Return>', self.execute_command)  # Привязка события к клавише Enter
+        self.command_entry.bind('<Return>', self.execute_command)  # Прив'язування події до кнопки Enter
 
-        # Создание кнопки для отправки команды
+        # Створення кнопки для надсилання команди
         self.send_button = tk.Button(master, text="Отправить", command=self.execute_command)
         self.send_button.grid(row=1, column=2, padx=padx_val, pady=pady_val, sticky='w')
 
-        # Создание поля вывода результатов выполнения команд
+        # Створення поля виводу результатів виконання команд
         self.console_output = scrolledtext.ScrolledText(master, width=170, height=20)
         self.console_output.grid(row=2, column=1, columnspan=3, padx=padx_val, pady=pady_val)
 
@@ -581,54 +581,54 @@ class GUI:
 
 
 
-        # Создание фрейма для размещения полей ввода
+        # Створення фрейму для розміщення вхідних полів
         input_frame = tk.Frame(master)
         input_frame.grid(row=3, column=1, padx=padx_val, pady=pady_val, sticky='w')
 
-        # Создание поля ввода для имени с подсказкой
+        # Створення поля введення для імені з підказкою
         self.name_var = StringVar()
-        self.name_var.set("введіть Ім'я")  # Начальная подсказка для имени
+        self.name_var.set("введіть Ім'я")
         self.name_entry = tk.Entry(input_frame, width=50, textvariable=self.name_var, fg='grey')
-        self.name_entry.grid(row=1, column=1, padx=padx_val, pady=pady_val, sticky='ew')  # sticky='ew' для растяжения по горизонтали
-        self.name_entry.bind("<FocusIn>", self.clear_name_placeholder)  # Удаление подсказки при фокусе
-        self.name_entry.bind("<FocusOut>", self.check_name_placeholder)  # Восстановление подсказки при потере фокуса
+        self.name_entry.grid(row=1, column=1, padx=padx_val, pady=pady_val, sticky='ew')  # sticky='ew' горизонтальне розтягування
+        self.name_entry.bind("<FocusIn>", self.clear_name_placeholder)  # Видалення підказки при фокусі
+        self.name_entry.bind("<FocusOut>", self.check_name_placeholder)  # Відновлення підказки при втраті фокуса
 
-        # Создание поля ввода для номера телефона с подсказкой
+        # Створення поля введення для номера телефону з підказкою
         self.phone_var = StringVar()
-        self.phone_var.set("введіть номер телефону")  # Начальная подсказка для телефона
+        self.phone_var.set("введіть номер телефону")  # Початкова підказка для телефону
         self.phone_entry = tk.Entry(input_frame, width=50, textvariable=self.phone_var, fg='grey')
-        self.phone_entry.grid(row=2, column=1, padx=padx_val, pady=pady_val, sticky='ew')  # sticky='ew' для растяжения по горизонтали
-        self.phone_entry.bind("<FocusIn>", self.clear_phone_placeholder)  # Удаление подсказки при фокусе
-        self.phone_entry.bind("<FocusOut>", self.check_phone_placeholder)  # Восстановление подсказки при потере фокуса
+        self.phone_entry.grid(row=2, column=1, padx=padx_val, pady=pady_val, sticky='ew')  # sticky='ew' горизонтальне розтягування
+        self.phone_entry.bind("<FocusIn>", self.clear_phone_placeholder)  # Видалення підказки при фокусі
+        self.phone_entry.bind("<FocusOut>", self.check_phone_placeholder)  # Відновлення підказки при втраті фокуса
 
-        # Создание кнопки для добавления контакта
+        # Створення кнопки для додавання контакту
         self.add_button = tk.Button(input_frame, text="   Записати Контакт   ", command=self.add_record)
-        self.add_button.grid(row=3, column=1, padx=padx_val, pady=pady_val, sticky='ew')  # sticky='ew' для растяжения по горизонтали
+        self.add_button.grid(row=3, column=1, padx=padx_val, pady=pady_val, sticky='ew')  # sticky='ew' горизонтальне розтягування
 
         self.save_button = tk.Button(master, text="Зберегти нові записи в файл", command=self.save_to_file)
-        self.save_button.grid(row=4, column=1, padx=padx_val, pady=pady_val, sticky='w' )  # 'w' для выравнивания по левому краю
+        self.save_button.grid(row=4, column=1, padx=padx_val, pady=pady_val, sticky='w' )  # 'w' для вирівнювання на лівому краю
 
-        # Создание кнопки для загрузки из файла
+        # Створення кнопки для завантаження з файлу
         self.load_button = tk.Button(master, text="Завантажити данні з файлу    ", command=self.load_from_file)
-        self.load_button.grid(row=5, column=1, padx=padx_val, pady=pady_val, sticky='w' )  # 'w' для выравнивания по левому краю
+        self.load_button.grid(row=5, column=1, padx=padx_val, pady=pady_val, sticky='w' )  # 'w' для вирівнювання на лівому краю
 
 
 
 
 
-        # Создание кнопки для отображения всех контактов
+        # Створення кнопки для відображення всіх контактів
         self.all_button = tk.Button(master, text="Показати Всі Контакти", command=self.display_all_contacts)
         self.all_button.grid(row=3, column=3, padx=padx_val, pady=pady_val)
 
-        # Создание кнопки для отображения всей информации
+        # Створення кнопки для відображення всієї інформації
         self.display_button = tk.Button(master, text="Показати всю Інформацію", command=self.display_all)
         self.display_button.grid(row=4, column=3, padx=padx_val, pady=pady_val)
-        # Создание кнопки для показа дней рождения
+        # Створення кнопки для показу днів народження
 
 
     def birthdays(self):
         today = datetime.datetime.now()
-        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': [], 'Today': []}
+        birthdays_this_week = {'Понеділок': [], 'Вівторок': [], 'Середа': [], 'Четвер': [], 'П"ятинця': [], 'Субота': [], 'Неділя': [], 'Сьогодні': []}
         from_day_column_width = 18
 
         for record in self.book.data.values():
@@ -638,19 +638,19 @@ class GUI:
                 delta_days = (next_birthday - today).days
                 birthday_weekday = next_birthday.strftime('%A')
 
-                if next_birthday < today and (birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday') and birthday_weekday != 'Friday' and birthday_weekday != 'Thursday':
+                if next_birthday < today and (birthday_weekday == 'Субота' or birthday_weekday == 'Неділя') and birthday_weekday != 'П"ятинця' and birthday_weekday != 'Четвер':
                     from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)
-                    birthdays_this_week['Monday'].append((record, from_day))
+                    birthdays_this_week['Понеділок'].append((record, from_day))
 
                 if delta_days == 7:
-                    if 'Next Monday' not in birthdays_this_week:
-                        birthdays_this_week['Next Monday'] = []
-                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+                    if 'Наступний понеділок' not in birthdays_this_week:
+                        birthdays_this_week['Наступний понеділок'] = []
+                    birthdays_this_week['Наступний понеділок'].append(f"{record.name.value} (will be on {birthday_weekday})")
                 elif 0 <= delta_days < 7:
-                    if birthday_weekday in ['Saturday', 'Sunday']:
-                        if 'Next Monday' not in birthdays_this_week:
-                            birthdays_this_week['Next Monday'] = []
-                        birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
+                    if birthday_weekday in ['Субота', 'Неділя']:
+                        if 'Наступний понеділок' not in birthdays_this_week:
+                            birthdays_this_week['Наступний понеділок'] = []
+                        birthdays_this_week['Наступний понеділок'].append(f"{record.name.value} (from {birthday_weekday})")
                     else:
                         birthdays_this_week[birthday_weekday].append(record.name.value)
 
@@ -658,22 +658,22 @@ class GUI:
                     birthdays_this_week[birthday_weekday].append((record, ''))
                 else:
                     if delta_days == 0 and birthday_date.strftime('%d.%m') == today.strftime('%d.%m'):
-                        birthdays_this_week['Today'].append((record, ''))
+                        birthdays_this_week['Сьогодні'].append((record, ''))
                     elif 0 <= delta_days < 6:
                         from_day = ''
-                        if birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday':
-                            birthday_weekday = 'Monday'
+                        if birthday_weekday == 'Субота' or birthday_weekday == 'Неділя':
+                            birthday_weekday = 'Понеділок'
                             from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)
                         elif record not in birthdays_this_week[birthday_weekday]:
                             birthdays_this_week[birthday_weekday].append((record, from_day))
 
-        # Очищаем текстовое поле перед выводом информации
+        # Очищуємо текстове поле перед виводом інформації
         self.console_output.delete(1.0, tk.END)
 
-        # Выводим информацию о днях рождений в текстовое поле
+        # Відображаємо інформацію про дні народження в текстовому полі
         output = "Майбутні дні народження:\n"
         for day, contacts in birthdays_this_week.items():
-            if day != 'Today' and contacts:
+            if day != 'Сьогодні' and contacts:
                 output += f"\n{day}:\n"
                 for contact_data in contacts:
                     if len(contact_data) == 2:
@@ -693,58 +693,46 @@ class GUI:
                             f"{contact.show_email()}{' ' * email_padding}\n"
                         )
                     else:
-                        # Пропускаем обработку элемента, который не соответствует ожидаемому формату
+                        # Пропускаємо обробку елемента, який не відповідає очікуваному формату
                         continue
 
-        # Вставляем результат в текстовое поле
+        # Вставляємо результат у текстове поле
         self.console_output.insert(tk.END, output)
 
 
     def execute_command(self, event=None):
-        command = self.command_entry.get()  # Получаем текст из поля ввода
-        # Выполняем команду и выводим результат в поле вывода
+        command = self.command_entry.get()  # Отримуємо текст із поля введення
+        # Виконуємо команду та відображаємо результат у полі виводу
         output = subprocess.getoutput(command)
         self.console_output.insert(tk.END, f"{output}\n")
 
-    # Измененный метод для вывода результатов в интерфейс
+    # Змінений метод для виведення результатів в інтерфейс
     def show_birthdays(self):
   
-        output = self.book.birthdays()  # Вызываем метод birthdays из объекта book
-        self.console_output.delete(1.0, tk.END)  # Очищаем текстовое поле перед выводом
-        self.console_output.insert(tk.END, output)  # Вставляем результат в текстовое поле
-
-    # def show_birthdays(self):
-    #     upcoming_birthdays = self.book.birthdays()  # использование self.book вместо book
-    #     self.console_output.delete(1.0, tk.END)
-    #     self.console_output.insert(tk.END, "\nМайбутні дні народження:\n")
-    #     for name in upcoming_birthdays:
-    #         contact = self.book.find(name)  # использование self.book вместо book
-    #         if contact:
-    #             phone_number = ", ".join(str(phone) for phone in contact.phones) if contact.phones else "Немає номеру телефону"
-    #             self.console_output.insert(tk.END, f"День народження {name} буде на {contact.birthday}, номер для дзвінка {phone_number}\n")
-    #         else:
-    #             self.console_output.insert(tk.END, f"Контакт для {name} не знайдено\n")
+        output = self.book.birthdays()  # Викликаємо метод birthdays з об'єкта book
+        self.console_output.delete(1.0, tk.END)  # Очищення текстового поля перед виходом
+        self.console_output.insert(tk.END, output)  # Вставляємо результат у текстове поле
 
 
     def clear_name_placeholder(self, event):
         if self.name_var.get() == "введіть Ім'я":
             self.name_var.set('')
-            self.name_entry.config(fg='black')  # Изменение цвета текста при удалении подсказки
+            self.name_entry.config(fg='black')  # Зміна кольору тексту при видаленні підказки
 
     def check_name_placeholder(self, event):
         if not self.name_var.get():
             self.name_var.set("введіть Ім'я")
-            self.name_entry.config(fg='grey')  # Изменение цвета текста при восстановлении подсказки
+            self.name_entry.config(fg='grey')  # Зміна кольору тексту при відновленні підказки
 
     def clear_phone_placeholder(self, event):
         if self.phone_var.get() == "введіть номер телефону":
             self.phone_var.set('')
-            self.phone_entry.config(fg='black')  # Изменение цвета текста при удалении подсказки
+            self.phone_entry.config(fg='black')  # Зміна кольору тексту при видаленні підказки
 
     def check_phone_placeholder(self, event):
         if not self.phone_var.get():
             self.phone_var.set("введіть номер телефону")
-            self.phone_entry.config(fg='grey')  # Изменение цвета текста при восстановлении подсказки
+            self.phone_entry.config(fg='grey')  # Зміна кольору тексту при відновленні підказки
 
     def add_record(self):
         name = self.name_entry.get().strip()
@@ -753,29 +741,29 @@ class GUI:
             record = Record(name)
             record.add_phone(phone)
             self.address_book.add_record(record)
-            self.console_output.insert(tk.END, f"Added: {record}\n")
+            self.console_output.insert(tk.END, f"Додано: {record}\n")
             self.name_entry.delete(0, tk.END)
             self.phone_entry.delete(0, tk.END)
         else:
-            self.console_output.insert(tk.END, "Please enter both name and phone!\n")
+            self.console_output.insert(tk.END, "Будь ласка, введіть і ім'я, і телефон!\n")
 
 
     def display_all_contacts(self):
         names = self.address_book.all_names()
-#        self.console_output.delete(1.0, tk.END)  # Очищаем вывод перед отображением новых результатов
+#        self.console_output.delete(1.0, tk.END)  # Очистіть вихідне поле перед відображенням нових результатів
         for name in names:
             self.console_output.insert(tk.END, f"{name}\n")
-        # Прокручиваем текст вниз
+        # Прокручуємо текст вниз
         self.console_output.see(tk.END)  
 
 
 
     def display_all(self):
-        #self.console_output.delete(1.0, tk.END)  # Очистить поле вывода перед отображением новых данных
+        #self.console_output.delete(1.0, tk.END)  # Очистіть вихідне поле перед відображенням нових даних
         self.console_output.insert(tk.END, "All Records:\n")
         for record in self.address_book.data.values():
             self.console_output.insert(tk.END, f"{record}\n")
-        self.console_output.see(tk.END) # Прокручиваем текст вниз
+        self.console_output.see(tk.END) # Прокручуємо текст вниз
 
     def save_to_file(self):
         filename = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON Files", "*.json")])
@@ -787,14 +775,14 @@ class GUI:
         filename = filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
         if filename:
             self.address_book.load_from_json(filename)
-            self.console_output.insert(tk.END, f"Loaded data from file: {filename}\n")
+            self.console_output.insert(tk.END, f"Завантажено дані з файлу: {filename}\n")
 
-# Создаем объект AddressBook и окно Tkinter
+# Створюємо об’єкт AddressBook та вікно Tkinter
 
 
 book = AddressBook()
 root = tk.Tk()
-gui = GUI(root, book)  # Используем объект book для передачи в GUI
+gui = GUI(root, book)  # Використовуємо об'єкт book для передачі в GUI
 root.mainloop()
 
 # _______________________________________________________________________________________________________________________________
@@ -817,7 +805,7 @@ def command_line_digital_keys(key, command,book):
             print(f"Контакт {name} додано успішно!")
 
         def command_add_notion():
-            if command.startswith("add-notion "):
+            if command.startswith("add-notion"):
                 parts = command.split(" ", 3)
                 if len(parts) >= 4:
                     name, text, hashtags = parts[1], parts[2], parts[3]
@@ -831,7 +819,7 @@ def command_line_digital_keys(key, command,book):
                     print("Недостатньо аргументів. Використовуйте формат: add-notion [ім'я] [текст] [хештеги]")
 
         def command_find_notions():
-            if command.startswith("find-notions "):
+            if command.startswith("find-notions"):
                 hashtag = command.split(" ", 1)[1]
                 results = book.find_by_notion_or_hashtag(hashtag)
                 if results:
@@ -844,7 +832,7 @@ def command_line_digital_keys(key, command,book):
                     return f"Нотатки з '#{hashtag}' не знайдено."
             
         def command_sort_by_hashtag():
-            if command.startswith("sort-by-hashtag "):
+            if command.startswith("sort-by-hashtag"):
                 hashtag = command.split(" ", 1)[1]
                 sorted_contacts = book.sort_by_hashtag(hashtag)
                 if sorted_contacts:
@@ -870,7 +858,7 @@ def command_line_digital_keys(key, command,book):
                 return "Контакт не знайдено!"
 
         def command_edit_notion():
-            if command.startswith("edit-notion "):
+            if command.startswith("edit-notion"):
                 parts = command.split(" ", 4)
                 if len(parts) >= 5:
                     name, index, new_text, new_hashtags = parts[1], parts[2], parts[3], parts[4]
@@ -949,7 +937,7 @@ def command_line_digital_keys(key, command,book):
         def command_all_names():
             existing_names = book.all_names()
             if existing_names:
-                print("Existing contact names:")
+                print("Існуючі імена контактів:")
                 for name in existing_names:
                     print(name)
             else:
@@ -1004,7 +992,7 @@ def command_line_digital_keys(key, command,book):
 
         def command_find_birth():
             birthday_to_find = input(
-                "Введіть день народження для пошуку (дд.мм.рррр): ")
+                "Введіть день народження для пошуку (ДД.ММ.РРРР): ")
             found_contacts = Find.find_by_birthday(book, birthday_to_find)
             if found_contacts:
                 print("Знайдені контакти:")
@@ -1304,14 +1292,6 @@ def main():
        
         elif command == 'hello':
             print("\nПривіт! Як я можу допомогти вам?")
-        
-        # elif command == 'add':
-        #     name = input("Введіть ім'я контакту: ").strip()
-        #     phone = input("Введіть номер телефону: ").strip()
-        #     record = Record(name)
-        #     record.add_phone(phone)
-        #     book.add_record(record)
-        #     print(f"Контакт {name} додано успішно!")
 
         elif command == 'add':
             name = input("\nВведіть ім'я контакту: ").strip()
@@ -1381,7 +1361,7 @@ def main():
                     old_phone_index = input("\nВведіть індекс номеру телефону, який хочете змінити: ")
                     new_phone = input("\nВведіть новий номер телефону: ").strip()
                     contact.edit_phone(old_phone_index, new_phone)
-                    print("\nНомер телефону був успішно змінен")
+                    print("\nНомер телефону успішно змінено.")
             else:
                 print("\nКонтакт не знайдено!")
 
@@ -1504,7 +1484,6 @@ def main():
             for record in book.data.values():
                 print(f"\n{record}")
                 
-        # Цієї команди all-names немає в "Доступні команди:" - можливо вона взагалі не потрібна
         elif command == 'all-names':
             existing_names = book.all_names()
             if existing_names:
@@ -1650,28 +1629,6 @@ def main():
             else:
                 print("\nКонтакт не знайдено.")
 
-        # Ця command == 'find-phone' - дубль - необхідно видалити
-        elif command == 'find-phone':
-            phone_to_find = input("\nВведіть номер телефону для пошуку: ")
-            found_contacts = Find.find_by_phone(book, phone_to_find)
-            if found_contacts:
-                print("\nЗнайдені контакти: ")
-                for contact in found_contacts:
-                    print(contact)
-            else:
-                print("\nКонтакти не знайдено.")
-
-        # Ця command == 'find-birth' - дубль - необхідно видалити
-        elif command == 'find-birth':
-            birthday_to_find = input("\nВведіть дату народження для пошуку (дд.мм.рррр): ")
-            found_contacts = Find.find_by_birthday(book, birthday_to_find)
-            if found_contacts:
-                print("\nЗнайдені контакти: ")
-                for contact in found_contacts:
-                    print(contact)
-            else:
-                print("\nКонтакти не знайдено.")
-
         elif command == 'add-address':
             name = input("\nВведіть ім’я контакту, до якого потрібно додати адресу: ")
             name_key = name.lower()
@@ -1744,8 +1701,6 @@ def main():
 
         else:
             print("\nНеправильна команда.")
-            # print("\n Неправильна команда. \nБудь ласка, спробуйте ще раз.")
-            # Цей print був до того, як з'явилися повідомлення з підказками для невірних команд - його та цей коментар можна видаляти
 
         # Словник доступних команд
         available_commands = {

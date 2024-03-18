@@ -22,11 +22,11 @@ class Address:
         if self.addresses:
             return f"\nАдреса для контакту {name}: {self.addresses[0]}"
         else:
-            return "Адреса не була вказана"
+            return "Адреса не була вказана."
             
     def edit_address(self, new_address):
         self.addresses = [new_address]
-        return "Адресу успішно відредаговано"
+        return "Адресу успішно відредаговано."
 
     def delete_address(self, address):
         self.addresses = [a for a in self.addresses if str(a) != str(address)]
@@ -358,7 +358,7 @@ class AddressBook(UserDict):
 
     def birthdays(self):
         today = datetime.datetime.now()
-        birthdays_this_week = {'Monday': [], 'Tuesday': [], 'Wednesday': [], 'Thursday': [], 'Friday': [], 'Saturday': [], 'Sunday': [], 'Today': []}
+        birthdays_this_week = {'Понеділок': [], 'Вівторок': [], 'Середа': [], 'Четвер': [], 'П"ятниця': [], 'Субота': [], 'Неділя': [], 'Сьогодні': []}
         from_day_column_width = 18
 
         for record in self.data.values():
@@ -368,42 +368,42 @@ class AddressBook(UserDict):
                 delta_days = (next_birthday - today).days
                 birthday_weekday = next_birthday.strftime('%A')
 
-                if next_birthday < today and (birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday') and birthday_weekday != 'Friday' and birthday_weekday != 'Thursday':
-                    from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)  # Заполняем колонку from
-                    birthdays_this_week['Monday'].append((record, from_day)) # Добавляем в список для понедельника
+                if next_birthday < today and (birthday_weekday == 'Субота' or birthday_weekday == 'Неділя') and birthday_weekday != 'П"ятниця' and birthday_weekday != 'Четвер':
+                    from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)  # Заповнюємо стовпець from
+                    birthdays_this_week['Понеділок'].append((record, from_day)) # Додаємо до списку для понеділка
 
-                # Обработка дней рождений для предыдущего кода
+                # Обробка днів народження для попереднього коду
                 if delta_days == 7:
-                    if 'Next Monday' not in birthdays_this_week:
-                        birthdays_this_week['Next Monday'] = []
-                    birthdays_this_week['Next Monday'].append(f"{record.name.value} (will be on {birthday_weekday})")
+                    if 'Наступний понеділок' not in birthdays_this_week:
+                        birthdays_this_week['Наступний понеділок'] = []
+                    birthdays_this_week['Наступний понеділок'].append(f"{record.name.value} (will be on {birthday_weekday})")
                 elif 0 <= delta_days < 7:
-                    if birthday_weekday in ['Saturday', 'Sunday']:
-                        if 'Next Monday' not in birthdays_this_week:
-                            birthdays_this_week['Next Monday'] = []
-                        birthdays_this_week['Next Monday'].append(f"{record.name.value} (from {birthday_weekday})")
+                    if birthday_weekday in ['Субота', 'Неділя']:
+                        if 'Наступний понеділок' not in birthdays_this_week:
+                            birthdays_this_week['Наступний понеділок'] = []
+                        birthdays_this_week['Наступний понеділок'].append(f"{record.name.value} (from {birthday_weekday})")
                     else:
                         birthdays_this_week[birthday_weekday].append(record.name.value)
 
-                # Обработка дней рождений для второго кода
+                # Обробка днів народження для другого коду
                 if next_birthday.strftime('%d.%m') == today.strftime('%d.%m'):
                     birthdays_this_week[birthday_weekday].append((record, ''))
                 else:
                     if delta_days == 0 and birthday_date.strftime('%d.%m') == today.strftime('%d.%m'):
-                        birthdays_this_week['Today'].append((record, ''))
+                        birthdays_this_week['Сьогодні'].append((record, ''))
                     elif 0 <= delta_days < 6:
                         from_day = ''
-                        if birthday_weekday == 'Saturday' or birthday_weekday == 'Sunday':
-                            birthday_weekday = 'Monday'
+                        if birthday_weekday == 'Субота' or birthday_weekday == 'Неділя':
+                            birthday_weekday = 'Понеділок'
                             from_day = f' (from {birthday_weekday})'.ljust(from_day_column_width)
                         elif record not in birthdays_this_week[birthday_weekday]:
                             birthdays_this_week[birthday_weekday].append((record, from_day))
 
-        print("Upcoming birthdays:")
+        print("Майбутні дні народження:")
         upcoming_birthdays = []
 
         for day, contacts in birthdays_this_week.items():
-            if day != 'Today' and contacts:
+            if day != 'Сьогодні' and contacts:
                 print(f"\n{day}:")
                 for contact_data in contacts:
                     if len(contact_data) == 2:
@@ -425,7 +425,7 @@ class AddressBook(UserDict):
                             Style.RESET_ALL
                         )
                     else:
-                        # Пропускаем обработку элемента, который не соответствует ожидаемому формату
+                        # Пропускаємо обробку елемента, який не відповідає очікуваному формату
                         continue
 
         return upcoming_birthdays
@@ -523,7 +523,7 @@ def command_line_helper(args=None):
             " 28: load [файл.json]                                               -- для завантаження контактів з файлу JSON\n"
             "q /good bye/close/exit/quit                                         -- для виходу з програми\n"
             "\n Виберіть цифру 1 до 28 або"  
-            "\n Введіть команду повність:"
+            "\n Введіть команду повністю:"
             "\n")
     return help
 # _______________________________________________________________________________________________________________________________
@@ -674,7 +674,7 @@ def command_line_digital_keys(key, command,book):
         def command_all_names():
             existing_names = book.all_names()
             if existing_names:
-                print("Existing contact names:")
+                print("Існуючі імена контактів:")
                 for name in existing_names:
                     print(name)
             else:
@@ -729,7 +729,7 @@ def command_line_digital_keys(key, command,book):
 
         def command_find_birth():
             birthday_to_find = input(
-                "Введіть день народження для пошуку (дд.мм.рррр): ")
+                "Введіть день народження для пошуку (ДД.ММ.РРРР): ")
             found_contacts = Find.find_by_birthday(book, birthday_to_find)
             if found_contacts:
                 print("Знайдені контакти:")
@@ -737,36 +737,6 @@ def command_line_digital_keys(key, command,book):
                     print(contact)
             else:
                 print("Контакти не знайдено.")
-
-        def command_find_name():
-            name_to_find = input("Enter name to find: ")
-            found_contacts = Find.find_by_name(book, name_to_find)
-            if found_contacts:
-                print("Found contacts:")
-                for contact in found_contacts:
-                    print(contact)
-            else:
-                print("No contacts found.")
-
-        def command_find_phone():
-            phone_to_find = input("Enter phone number to find: ")
-            found_contacts = Find.find_by_phone(book, phone_to_find)
-            if found_contacts:
-                print("Found contacts:")
-                for contact in found_contacts:
-                    print(contact)
-            else:
-                print("No contacts found.")
-
-        def command_find_birth():
-            birthday_to_find = input("Enter birthday to find (dd.mm.yyyy): ")
-            found_contacts = Find.find_by_birthday(book, birthday_to_find)
-            if found_contacts:
-                print("Found contacts:")
-                for contact in found_contacts:
-                    print(contact)
-            else:
-                print("No contacts found.")
 
         def command_add_email():
             nonlocal email 
@@ -820,50 +790,50 @@ def command_line_digital_keys(key, command,book):
                 print(f"Контакт {name} не знайдено!")
 
         def command_add_address():
-            name = input("Enter the name of the contact you want to add the address to: ")
+            name = input("Введіть назву контакту, до якого ви хочете додати адресу: ")
             name_key = name.lower()
             if name_key in book:
-                address = input("Enter the address: ").strip()
+                address = input("Введіть адресу: ").strip()
                 record = book[name_key]
                 record.add_address(address)
-                print(f"Address {address} added to contact {name} successfully!")
+                print(f"Адреса {address} успішно додана до контакту {name}!")
             else:
                 print(f"Контакт {name} не знайдено.")
 
         def command_show_address():
-            name = input("Enter the name of the contact whose address you want to see: ")
+            name = input("Введіть назву контакту, адресу якого ви хочете побачити: ")
             name_key = name.lower()
             if name_key in book:
                 record = book[name_key]
                 if record.address:
                     print(record.address.show_address(record.name.value))
                 else:
-                    print("Address for this contact has not been added yet or has been deleted")
+                    print("Адреса для цього контакту ще не додана або була видалена.")
             else:
                 print("Контакт не знайдено.")
 
         def command_edit_address():
-            name = input("Enter the name of the contact whose address you want to change: ")
+            name = input("Введіть назву контакту, адресу якого ви хочете змінити: ")
             name_key = name.lower()
             if name_key in book:
                 record = book[name_key]
                 if record.address:
-                    new_address = input("Enter the new address: ")
+                    new_address = input("Введіть нову адресу: ")
                     book.edit_address(name, new_address)
                 else:
-                    print(f"No address has been added to {name} yet.")
+                    print(f"Адреса ще не додана до контакту {name}.")
 
 
         def command_delete_address():
-            name = input("Enter the name of the contact whose address you want to delete: ")
+            name = input("Введіть назву контакту, адресу якого ви хочете видалити: ")
             name_key = name.lower()
             if name_key in book:
                 record = book[name_key]
                 if record.address:
                     record.delete_address(record.address.show_address(name))
-                    print(f"Address for {name} has been successfully deleted.")
+                    print(f"Адресу контакту {name} успішно видалено.")
                 else:
-                    print(f"No address was provided for {name}.")
+                    print(f"Адреса для цього контакту ще не додана або була видалена.")
             else:
                 print(f"Контакт {name} не знайдено.")
 
@@ -1026,14 +996,6 @@ def main():
        
         elif command == 'hello':
             print("\nПривіт! Як я можу допомогти вам?")
-        
-        # elif command == 'add':
-        #     name = input("Введіть ім'я контакту: ").strip()
-        #     phone = input("Введіть номер телефону: ").strip()
-        #     record = Record(name)
-        #     record.add_phone(phone)
-        #     book.add_record(record)
-        #     print(f"Контакт {name} додано успішно!")
 
         elif command == 'add':
             name = input("\nВведіть ім'я контакту: ").strip()
@@ -1049,7 +1011,6 @@ def main():
                 record.add_phone(phone)
                 book.add_record(record)
                 print(f"\nКонтакт '{name}' додано успішно!")
-
                 
         elif command == 'add-notion':
             name = input("\nВведіть ім'я контакту до якого ви б хотіли додати нотатку: ")
@@ -1103,7 +1064,7 @@ def main():
                     old_phone_index = input("\nВведіть індекс номеру телефону, який хочете змінити: ")
                     new_phone = input("\nВведіть новий номер телефону: ").strip()
                     contact.edit_phone(old_phone_index, new_phone)
-                    print("\nНомер телефону був успішно змінен")
+                    print("\nНомер телефону успішно змінено.")
             else:
                 print("\nКонтакт не знайдено!")
 
@@ -1226,7 +1187,6 @@ def main():
             for record in book.data.values():
                 print(f"\n{record}")
                 
-        # Цієї команди all-names немає в "Доступні команди:" - можливо вона взагалі не потрібна
         elif command == 'all-names':
             existing_names = book.all_names()
             if existing_names:
@@ -1372,28 +1332,6 @@ def main():
             else:
                 print("\nКонтакт не знайдено.")
 
-        # Ця command == 'find-phone' - дубль - необхідно видалити
-        elif command == 'find-phone':
-            phone_to_find = input("\nВведіть номер телефону для пошуку: ")
-            found_contacts = Find.find_by_phone(book, phone_to_find)
-            if found_contacts:
-                print("\nЗнайдені контакти: ")
-                for contact in found_contacts:
-                    print(contact)
-            else:
-                print("\nКонтакти не знайдено.")
-
-        # Ця command == 'find-birth' - дубль - необхідно видалити
-        elif command == 'find-birth':
-            birthday_to_find = input("\nВведіть дату народження для пошуку (дд.мм.рррр): ")
-            found_contacts = Find.find_by_birthday(book, birthday_to_find)
-            if found_contacts:
-                print("\nЗнайдені контакти: ")
-                for contact in found_contacts:
-                    print(contact)
-            else:
-                print("\nКонтакти не знайдено.")
-
         elif command == 'add-address':
             name = input("\nВведіть ім’я контакту, до якого потрібно додати адресу: ")
             name_key = name.lower()
@@ -1466,8 +1404,6 @@ def main():
 
         else:
             print("\nНеправильна команда.")
-            # print("\n Неправильна команда. \nБудь ласка, спробуйте ще раз.")
-            # Цей print був до того, як з'явилися повідомлення з підказками для невірних команд - його та цей коментар можна видаляти
 
         # Словник доступних команд
         available_commands = {
