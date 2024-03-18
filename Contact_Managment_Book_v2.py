@@ -536,8 +536,7 @@ def command_line_digital_keys(key, command,book):
                     else:
                         print("Контакт не знайдено.")
                 else:
-                    print(
-                        "Недостатньо аргументів. Використовуйте формат: edit-notion [ім'я] [індекс] [новий текст] [нові хештеги]")
+                    print("Недостатньо аргументів. Використовуйте формат: edit-notion [ім'я] [індекс] [новий текст] [нові хештеги]")
 
         def command_delete_notion():
             if command.startswith("delete-notion "):
